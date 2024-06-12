@@ -1,0 +1,30 @@
+{
+  "name": "Chicken Curry",
+  "isVegetarian": false,
+  "servings": 4,
+  "instructions": "Boil rice in water with stock cube. Cook chicken, add spices and coconut milk. Simmer for 30 minutes.",
+  "ingredients": [
+    {
+      "name": "chicken breast",
+      "volume": "1 pound",
+      "remark": "can substitute with turkey"
+    },
+    {
+      "name": "coconut milk",
+      "volume": "1 can"
+    },
+    {
+      "name": "curry powder",
+      "volume": "2 table spoons"
+    },
+    {
+      "name": "rice",
+      "volume": "300 grams",
+      "remark": "basmati?"
+    },
+    {
+      "name": "stock cube",
+      "volume": "1"
+    }
+  ]
+}
