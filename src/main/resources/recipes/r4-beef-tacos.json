@@ -1,0 +1,38 @@
+{
+  "name": "Beef Tacos",
+  "isVegetarian": false,
+  "servings": 4,
+  "instructions": "Cook ground beef in a skillet until browned. Add taco seasoning and water, simmer for 5 minutes. Serve beef mixture in taco shells with lettuce, cheese, and salsa.",
+  "ingredients": [
+    {
+      "name": "ground beef",
+      "volume": "1 pound"
+    },
+    {
+      "name": "taco seasoning",
+      "volume": "1 packet"
+    },
+    {
+      "name": "water",
+      "volume": "1/2 cup"
+    },
+    {
+      "name": "taco shells",
+      "volume": "8"
+    },
+    {
+      "name": "lettuce",
+      "volume": "1 cup",
+      "remark": "shredded"
+    },
+    {
+      "name": "cheddar cheese",
+      "volume": "1 cup",
+      "remark": "shredded"
+    },
+    {
+      "name": "salsa",
+      "volume": "1 cup"
+    }
+  ]
+}

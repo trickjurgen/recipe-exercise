@@ -1,0 +1,35 @@
+{
+  "name": "Tomato Basil Soup",
+  "isVegetarian": true,
+  "servings": 4,
+  "instructions": "In a large pot, heat olive oil. Add chopped onions and garlic, cook until softened. Add tomatoes, broth, and basil leaves. Simmer for 20 minutes. Blend until smooth.",
+  "ingredients": [
+    {
+      "name": "olive oil",
+      "volume": "2 tablespoons"
+    },
+    {
+      "name": "onion",
+      "volume": "1",
+      "remark": "chopped"
+    },
+    {
+      "name": "garlic cloves",
+      "volume": "3",
+      "remark": "minced"
+    },
+    {
+      "name": "canned tomatoes",
+      "volume": "2 cans"
+    },
+    {
+      "name": "vegetable broth",
+      "volume": "4 cups"
+    },
+    {
+      "name": "basil leaves",
+      "volume": "1/2 cup",
+      "remark": "fresh"
+    }
+  ]
+}

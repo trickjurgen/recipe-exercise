@@ -1,0 +1,35 @@
+{
+  "name": "Spaghetti Bolognese",
+  "isVegetarian": false,
+  "servings": 4,
+  "instructions": "Cook spaghetti according to package instructions. In another pan, cook minced beef until browned. Add chopped onions, garlic, and carrots. Stir in tomato sauce and simmer for 20 minutes. Serve over spaghetti.",
+  "ingredients": [
+    {
+      "name": "spaghetti",
+      "volume": "400 grams"
+    },
+    {
+      "name": "minced beef",
+      "volume": "1 pound"
+    },
+    {
+      "name": "onion",
+      "volume": "1",
+      "remark": "chopped"
+    },
+    {
+      "name": "garlic cloves",
+      "volume": "2",
+      "remark": "minced"
+    },
+    {
+      "name": "carrot",
+      "volume": "1",
+      "remark": "diced"
+    },
+    {
+      "name": "tomato sauce",
+      "volume": "2 cups"
+    }
+  ]
+}

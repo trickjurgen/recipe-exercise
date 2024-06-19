@@ -1,0 +1,31 @@
+{
+  "name": "Chicken Caesar Salad",
+  "isVegetarian": false,
+  "servings": 4,
+  "instructions": "Grill chicken breast until cooked through. In a large bowl, combine chopped lettuce, croutons, Parmesan cheese, and Caesar dressing. Top with sliced grilled chicken.",
+  "ingredients": [
+    {
+      "name": "chicken breast",
+      "volume": "2",
+      "remark": "grilled and sliced"
+    },
+    {
+      "name": "romaine lettuce",
+      "volume": "1 head",
+      "remark": "chopped"
+    },
+    {
+      "name": "croutons",
+      "volume": "1 cup"
+    },
+    {
+      "name": "Parmesan cheese",
+      "volume": "1/2 cup",
+      "remark": "shredded"
+    },
+    {
+      "name": "Caesar dressing",
+      "volume": "1/2 cup"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "name": "Vegetable Stir Fry",
+  "isVegetarian": true,
+  "servings": 4,
+  "instructions": "Heat oil in a large pan. Add chopped vegetables and stir-fry for 5-7 minutes. Add soy sauce and cook for another 2 minutes. Serve with steamed rice.",
+  "ingredients": [
+    {
+      "name": "broccoli",
+      "volume": "1 head",
+      "remark": "cut into florets"
+    },
+    {
+      "name": "carrots",
+      "volume": "2",
+      "remark": "sliced"
+    },
+    {
+      "name": "bell peppers",
+      "volume": "2",
+      "remark": "sliced"
+    },
+    {
+      "name": "soy sauce",
+      "volume": "3 tablespoons"
+    },
+    {
+      "name": "olive oil",
+      "volume": "2 tablespoons"
+    },
+    {
+      "name": "rice",
+      "volume": "300 grams",
+      "remark": "steamed"
+    }
+  ]
+}
