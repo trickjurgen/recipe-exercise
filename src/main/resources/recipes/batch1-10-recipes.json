@@ -1,0 +1,388 @@
+[
+  {
+    "name": "Mushroom Risotto",
+    "isVegetarian": true,
+    "servings": 4,
+    "instructions": "In a pot, sauté onions and garlic in butter. Add mushrooms and cook until tender. Stir in arborio rice, then add vegetable broth gradually, stirring constantly until the rice is creamy and cooked. Finish with Parmesan cheese.",
+    "ingredients": [
+      {
+        "name": "onion",
+        "volume": "1",
+        "remark": "chopped"
+      },
+      {
+        "name": "garlic cloves",
+        "volume": "2",
+        "remark": "minced"
+      },
+      {
+        "name": "butter",
+        "volume": "2 tablespoons"
+      },
+      {
+        "name": "mushrooms",
+        "volume": "2 cups",
+        "remark": "sliced"
+      },
+      {
+        "name": "arborio rice",
+        "volume": "1 cup"
+      },
+      {
+        "name": "vegetable broth",
+        "volume": "4 cups"
+      },
+      {
+        "name": "Parmesan cheese",
+        "volume": "1/2 cup",
+        "remark": "grated"
+      }
+    ]
+  },
+  {
+    "name": "Beef Stroganoff",
+    "isVegetarian": false,
+    "servings": 4,
+    "instructions": "Cook egg noodles according to package instructions. In a separate pan, cook beef strips until browned. Add onions and mushrooms, cooking until tender. Stir in sour cream and beef broth, simmer for 10 minutes. Serve over noodles.",
+    "ingredients": [
+      {
+        "name": "egg noodles",
+        "volume": "8 ounces"
+      },
+      {
+        "name": "beef strips",
+        "volume": "1 pound"
+      },
+      {
+        "name": "onion",
+        "volume": "1",
+        "remark": "chopped"
+      },
+      {
+        "name": "mushrooms",
+        "volume": "2 cups",
+        "remark": "sliced"
+      },
+      {
+        "name": "sour cream",
+        "volume": "1 cup"
+      },
+      {
+        "name": "beef broth",
+        "volume": "1 cup"
+      }
+    ]
+  },
+  {
+    "name": "Lentil Soup",
+    "isVegetarian": true,
+    "servings": 4,
+    "instructions": "In a large pot, sauté onions, carrots, and celery in olive oil until tender. Add lentils, tomatoes, and vegetable broth. Simmer for 30 minutes or until lentils are cooked. Season with salt and pepper.",
+    "ingredients": [
+      {
+        "name": "olive oil",
+        "volume": "2 tablespoons"
+      },
+      {
+        "name": "onion",
+        "volume": "1",
+        "remark": "chopped"
+      },
+      {
+        "name": "carrots",
+        "volume": "2",
+        "remark": "sliced"
+      },
+      {
+        "name": "celery",
+        "volume": "2 stalks",
+        "remark": "sliced"
+      },
+      {
+        "name": "lentils",
+        "volume": "1 cup"
+      },
+      {
+        "name": "canned tomatoes",
+        "volume": "1 can"
+      },
+      {
+        "name": "vegetable broth",
+        "volume": "6 cups"
+      }
+    ]
+  },
+  {
+    "name": "Shrimp Scampi",
+    "isVegetarian": false,
+    "servings": 4,
+    "instructions": "Cook pasta according to package instructions. In a large pan, sauté garlic in butter and olive oil. Add shrimp, cooking until pink. Stir in lemon juice, white wine, and parsley. Toss with pasta and serve.",
+    "ingredients": [
+      {
+        "name": "pasta",
+        "volume": "12 ounces"
+      },
+      {
+        "name": "butter",
+        "volume": "2 tablespoons"
+      },
+      {
+        "name": "olive oil",
+        "volume": "2 tablespoons"
+      },
+      {
+        "name": "garlic cloves",
+        "volume": "4",
+        "remark": "minced"
+      },
+      {
+        "name": "shrimp",
+        "volume": "1 pound",
+        "remark": "peeled and deveined"
+      },
+      {
+        "name": "lemon juice",
+        "volume": "1/4 cup"
+      },
+      {
+        "name": "white wine",
+        "volume": "1/2 cup"
+      },
+      {
+        "name": "parsley",
+        "volume": "1/4 cup",
+        "remark": "chopped"
+      }
+    ]
+  },
+  {
+    "name": "Quinoa Salad",
+    "isVegetarian": true,
+    "servings": 4,
+    "instructions": "Cook quinoa according to package instructions. In a large bowl, combine quinoa, cherry tomatoes, cucumbers, red onion, and feta cheese. Dress with olive oil, lemon juice, salt, and pepper. Toss to combine.",
+    "ingredients": [
+      {
+        "name": "quinoa",
+        "volume": "1 cup"
+      },
+      {
+        "name": "cherry tomatoes",
+        "volume": "1 cup",
+        "remark": "halved"
+      },
+      {
+        "name": "cucumber",
+        "volume": "1",
+        "remark": "diced"
+      },
+      {
+        "name": "red onion",
+        "volume": "1/2",
+        "remark": "chopped"
+      },
+      {
+        "name": "feta cheese",
+        "volume": "1/2 cup",
+        "remark": "crumbled"
+      },
+      {
+        "name": "olive oil",
+        "volume": "3 tablespoons"
+      },
+      {
+        "name": "lemon juice",
+        "volume": "2 tablespoons"
+      },
+      {
+        "name": "salt",
+        "volume": "to taste"
+      },
+      {
+        "name": "black pepper",
+        "volume": "to taste"
+      }
+    ]
+  },
+  {
+    "name": "Chicken Alfredo",
+    "isVegetarian": false,
+    "servings": 4,
+    "instructions": "Cook fettuccine according to package instructions. In a pan, cook chicken breast until no longer pink. Add garlic, heavy cream, and Parmesan cheese, stirring until the sauce thickens. Toss with fettuccine and serve.",
+    "ingredients": [
+      {
+        "name": "fettuccine",
+        "volume": "12 ounces"
+      },
+      {
+        "name": "chicken breast",
+        "volume": "1 pound",
+        "remark": "sliced"
+      },
+      {
+        "name": "garlic cloves",
+        "volume": "2",
+        "remark": "minced"
+      },
+      {
+        "name": "heavy cream",
+        "volume": "1 cup"
+      },
+      {
+        "name": "Parmesan cheese",
+        "volume": "1 cup",
+        "remark": "grated"
+      }
+    ]
+  },
+  {
+    "name": "Stuffed Peppers",
+    "isVegetarian": true,
+    "servings": 4,
+    "instructions": "Preheat oven to 375°F (190°C). Cut tops off bell peppers and remove seeds. In a bowl, mix cooked rice, black beans, corn, and salsa. Stuff peppers with the mixture, top with cheese, and bake for 25 minutes.",
+    "ingredients": [
+      {
+        "name": "bell peppers",
+        "volume": "4"
+      },
+      {
+        "name": "cooked rice",
+        "volume": "2 cups"
+      },
+      {
+        "name": "black beans",
+        "volume": "1 can"
+      },
+      {
+        "name": "corn",
+        "volume": "1 cup"
+      },
+      {
+        "name": "salsa",
+        "volume": "1 cup"
+      },
+      {
+        "name": "cheddar cheese",
+        "volume": "1 cup",
+        "remark": "shredded"
+      }
+    ]
+  },
+  {
+    "name": "Salmon Teriyaki",
+    "isVegetarian": false,
+    "servings": 4,
+    "instructions": "In a bowl, mix soy sauce, honey, and garlic. Marinate salmon fillets in the mixture for 15 minutes. Cook salmon in a pan over medium heat until cooked through, basting with marinade. Serve with steamed rice and vegetables.",
+    "ingredients": [
+      {
+        "name": "salmon fillets",
+        "volume": "4"
+      },
+      {
+        "name": "soy sauce",
+        "volume": "1/4 cup"
+      },
+      {
+        "name": "honey",
+        "volume": "2 tablespoons"
+      },
+      {
+        "name": "garlic cloves",
+        "volume": "2",
+        "remark": "minced"
+      },
+      {
+        "name": "rice",
+        "volume": "2 cups",
+        "remark": "steamed"
+      },
+      {
+        "name": "vegetables",
+        "volume": "to serve"
+      }
+    ]
+  },
+  {
+    "name": "Pancakes",
+    "isVegetarian": true,
+    "servings": 4,
+    "instructions": "In a bowl, mix flour, baking powder, salt, and sugar. In another bowl, whisk milk, egg, and melted butter. Combine wet and dry ingredients, then cook pancakes on a griddle over medium heat until bubbles form and edges are dry. Flip and cook until golden brown.",
+    "ingredients": [
+      {
+        "name": "all-purpose flour",
+        "volume": "1 cup"
+      },
+      {
+        "name": "baking powder",
+        "volume": "2 teaspoons"
+      },
+      {
+        "name": "salt",
+        "volume": "1/2 teaspoon"
+      },
+      {
+        "name": "sugar",
+        "volume": "1 tablespoon"
+      },
+      {
+        "name": "milk",
+        "volume": "1 cup"
+      },
+      {
+        "name": "egg",
+        "volume": "1"
+      },
+      {
+        "name": "butter",
+        "volume": "2 tablespoons",
+        "remark": "melted"
+      }
+    ]
+  },
+  {
+    "name": "Chili Con Carne",
+    "isVegetarian": false,
+    "servings": 4,
+    "instructions": "In a large pot, cook ground beef until browned. Add onions, garlic, bell peppers, and cook until tender. Stir in kidney beans, tomatoes, chili powder, cumin, and paprika. Simmer for 30 minutes. Serve with rice or bread.",
+    "ingredients": [
+      {
+        "name": "ground beef",
+        "volume": "1 pound"
+      },
+      {
+        "name": "onion",
+        "volume": "1",
+        "remark": "chopped"
+      },
+      {
+        "name": "garlic cloves",
+        "volume": "3",
+        "remark": "minced"
+      },
+      {
+        "name": "bell peppers",
+        "volume": "2",
+        "remark": "chopped"
+      },
+      {
+        "name": "kidney beans",
+        "volume": "1 can"
+      },
+      {
+        "name": "canned tomatoes",
+        "volume": "1 can"
+      },
+      {
+        "name": "chili powder",
+        "volume": "2 tablespoons"
+      },
+      {
+        "name": "cumin",
+        "volume": "1 teaspoon"
+      },
+      {
+        "name": "paprika",
+        "volume": "1 teaspoon"
+      }
+    ]
+  }
+]
