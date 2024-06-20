@@ -13,27 +13,27 @@ class StringHelperTest {
     @Test
     void verifyStaticValues() {
         for (int i = 0; i < INPUTS.length; i++) {
-            assertThat(StringHelper.toTitleCase(INPUTS[i])).isEqualTo(EXPECTED[i]);
+            assertThat(NameStringHelper.toTitleCase(INPUTS[i])).isEqualTo(EXPECTED[i]);
         }
     }
 
     @Test
     void verifyStaticValuesNegativeCompareAndEmptyTypes() {
         for (String input : INPUTS) {
-            String titleCase = StringHelper.toTitleCase(input);
+            String titleCase = NameStringHelper.toTitleCase(input);
             assertThat(titleCase).isNotEqualTo(input);
             assertThat(titleCase).isEqualToIgnoringCase(input);
         }
         // empties
-        assertThat(StringHelper.toTitleCase("")).isEqualTo("");
-        assertThat(StringHelper.toTitleCase(" ")).isEqualTo("");
-        assertThat(StringHelper.toTitleCase("    ")).isEqualTo("");
-        assertThat(StringHelper.toTitleCase(" \t")).isEqualTo(""); // tab
+        assertThat(NameStringHelper.toTitleCase("")).isEqualTo("");
+        assertThat(NameStringHelper.toTitleCase(" ")).isEqualTo("");
+        assertThat(NameStringHelper.toTitleCase("    ")).isEqualTo("");
+        assertThat(NameStringHelper.toTitleCase(" \t")).isEqualTo(""); // tab
     }
 
     @Test
     void failOnNullInput() {
-        assertThatThrownBy(() -> StringHelper.toTitleCase(null)).isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() -> NameStringHelper.toTitleCase(null)).isInstanceOf(IllegalArgumentException.class);
     }
 
 }

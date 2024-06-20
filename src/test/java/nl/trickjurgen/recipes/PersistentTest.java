@@ -7,10 +7,11 @@ import nl.trickjurgen.recipes.datamodel.IngredientType;
 import nl.trickjurgen.recipes.datamodel.Recipe;
 import nl.trickjurgen.recipes.dto.IngredientDto;
 import nl.trickjurgen.recipes.dto.RecipeDto;
+import nl.trickjurgen.recipes.mapper.RecepAndIngrMapper;
 import nl.trickjurgen.recipes.repo.IngredientRepo;
 import nl.trickjurgen.recipes.repo.IngredientTypeRepo;
 import nl.trickjurgen.recipes.repo.RecipeRepo;
-import nl.trickjurgen.recipes.utils.StringHelper;
+import nl.trickjurgen.recipes.utils.NameStringHelper;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,6 @@ import org.springframework.core.io.ResourceLoader;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -76,26 +76,20 @@ public class PersistentTest {
 
     // this functionality will be in service later I guess
     private void createRecipe(RecipeDto recipeDto){
-        // TODO extract to mapper (2x)
-        String recipeName = StringHelper.toTitleCase(recipeDto.getName());
-        if (recipeRepo.findByName(recipeName).isPresent()){
-            logger.warn("already exists! {}", recipeName);
+        Recipe newRecipe = RecepAndIngrMapper.dtoToRecipeNoIngr(recipeDto);
+        if (recipeRepo.findByName(newRecipe.getName()).isPresent()){
+            logger.warn("already exists! {}", newRecipe.getName());
             return;
         }
-        Recipe recipe = Recipe.builder().name(recipeName)
-                .instructions(recipeDto.getInstructions()).isVegetarian(recipeDto.isVegetarian())
-                .servings(recipeDto.getServings())
-                .ingredients(new HashSet<>()).build();
         Set<IngredientDto> ingredients = recipeDto.getIngredients();
         for (IngredientDto ing: ingredients){
-            String correctedName = StringHelper.toTitleCase(ing.getName());
-            Optional<IngredientType> byName = ingredientTypeRepo.findByName(correctedName);
-            IngredientType ingType = byName.orElseGet(() -> ingredientTypeRepo.save(IngredientType.builder().name(correctedName).build()));
-            Ingredient savedIngr = ingredientRepo.save(
-                    Ingredient.builder().ingredientType(ingType).volume(ing.getVolume()).remark(ing.getRemark()).build());
-            recipe.getIngredients().add(savedIngr);
+            String correctedName = NameStringHelper.toTitleCase(ing.getName());
+            Optional<IngredientType> typeByName = ingredientTypeRepo.findByName(correctedName);
+            IngredientType ingType = typeByName.orElseGet(() -> ingredientTypeRepo.save(IngredientType.builder().name(correctedName).build()));
+            Ingredient savedIngredient = ingredientRepo.save(RecepAndIngrMapper.dtoToIngredientWithType(ing, ingType));
+            newRecipe.getIngredients().add(savedIngredient);
         }
-        recipeRepo.save(recipe);
+        recipeRepo.save(newRecipe);
     }
 
 }
