@@ -1,0 +1,11 @@
+package nl.trickjurgen.recipes.exception;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ResponseStatus;
+
+@ResponseStatus(HttpStatus.BAD_REQUEST)
+public class RecipeParameterException extends RuntimeException {
+    public RecipeParameterException(String message) {
+        super(message);
+    }
+}

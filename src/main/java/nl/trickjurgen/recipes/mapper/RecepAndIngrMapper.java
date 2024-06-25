@@ -16,6 +16,7 @@ public class RecepAndIngrMapper {
     public static Recipe dtoToRecipeNoIngr(final RecipeDto recipeDto) {
         final String recipeName = NameStringHelper.toTitleCase(recipeDto.getName());
         return Recipe.builder()
+                .id(recipeDto.getId()) // optional field
                 .name(recipeName)
                 .instructions(recipeDto.getInstructions())
                 .isVegetarian(recipeDto.isVegetarian())
@@ -25,7 +26,8 @@ public class RecepAndIngrMapper {
     }
 
     public static Ingredient dtoToIngredientWithType(final IngredientDto ingredientDto, final IngredientType ingredientType) {
-        return Ingredient.builder()
+        return Ingredient.builder() // optional field
+                .id(ingredientDto.getId())
                 .ingredientType(ingredientType)
                 .volume(ingredientDto.getVolume())
                 .remark(ingredientDto.getRemark())
@@ -34,7 +36,7 @@ public class RecepAndIngrMapper {
 
     public static RecipeDto recipeToDto(final Recipe recipe) {
         return RecipeDto.builder()
-                .id(recipe.getId())
+                .id(recipe.getId()) // optional field
                 .name(recipe.getName())
                 .isVegetarian(recipe.isVegetarian())
                 .servings(recipe.getServings())
@@ -46,7 +48,7 @@ public class RecepAndIngrMapper {
 
     public static IngredientDto ingredientToDto(final Ingredient ingredient) {
         return IngredientDto.builder()
-                .id(ingredient.getId())
+                .id(ingredient.getId()) // optional field
                 .name(ingredient.getIngredientType().getName())
                 .volume(ingredient.getVolume())
                 .remark(ingredient.getRemark())
