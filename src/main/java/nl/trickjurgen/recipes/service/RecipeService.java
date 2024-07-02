@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -167,28 +168,29 @@ public class RecipeService {
 
         if (null != includes) {
             filters.addAll(
-                includes.stream()
+                    includes.stream()
                             .map(NameStringHelper::toTitleCase)
-                            .map(titleCase -> (Predicate<Recipe>) recipe -> flatListIngredients(recipe).contains(titleCase) )
+                            .map(titleCase -> (Predicate<Recipe>) recipe -> flatListIngredients(recipe).contains(titleCase))
                             .toList()
             );
         }
 
         if (null != excludes) {
-        for (String ingredientName : excludes) {
+            for (String ingredientName : excludes) {
                 final String titleCase = NameStringHelper.toTitleCase(ingredientName);
                 filters.add(recipe -> !flatListIngredients(recipe).contains(titleCase));
             }
         }
 
-        Predicate<Recipe> combinedFilter = filters.stream().reduce(Predicate::and).orElse(x -> true);
-        List<Recipe> filteredRecipes = allRecipes.stream().filter(combinedFilter).toList();
+        final Predicate<Recipe> combinedFilter = filters.stream().reduce(Predicate::and).orElse(x -> true);
+        final List<Recipe> filteredRecipes = allRecipes.stream().filter(combinedFilter).toList();
         return filteredRecipes.stream()
                 .map(RecepAndIngrMapper::recipeToDto)
                 .collect(Collectors.toList());
     }
 
-    List<String> flatListIngredients(final Recipe recipe){
+    /*default*/ List<String> flatListIngredients(final Recipe recipe) {
+        if (recipe.getIngredients() == null) return Collections.emptyList();
         return recipe.getIngredients().stream().map(ingredient -> ingredient.getIngredientType().getName()).toList();
     }
 
