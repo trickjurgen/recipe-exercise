@@ -12,6 +12,7 @@ import nl.trickjurgen.recipes.repo.IngredientRepo;
 import nl.trickjurgen.recipes.repo.IngredientTypeRepo;
 import nl.trickjurgen.recipes.repo.RecipeRepo;
 import nl.trickjurgen.recipes.utils.NameStringHelper;
+import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -63,7 +64,7 @@ class RecipeServiceTest {
 
     @BeforeAll
     static void setup() {
-        long i = 1L;
+        long i = 11L;
         baseRecipeData = new ArrayList<>();
         baseRecipeData.add(Recipe.builder().id(i++).name("Chicken Curry")
                 .isVegetarian(false).servings(4)
@@ -228,35 +229,72 @@ class RecipeServiceTest {
         assertThatThrownBy(() -> recipeService.deleteRecipe(405L)).isInstanceOf(RecipeNotFoundException.class);
     }
 
-    private List<RecipeDto> readManyDtoFromFile(final String fileName) {
+    private List<RecipeDto> readManyDtoFromFile() {
         try {
-            RecipeDto[] recipeDtos = objectMapper.readValue(getBytesFromJsonFile(fileName), RecipeDto[].class);
+            RecipeDto[] recipeDtos = objectMapper.readValue(getBytesFromJsonFile("batch1-10-recipes.json"), RecipeDto[].class);
             assertThat(recipeDtos).isNotNull();
             return List.of(recipeDtos);
         } catch (Exception e) {
-            fail("file {} load issue: {}", fileName, e.getMessage());
+            fail("file {} load issue: {}", "batch1-10-recipes.json", e.getMessage());
             throw new AssertionError(e);
         }
     }
 
     private Recipe convertDtoToRecipe(RecipeDto rDto) {
         Recipe recipe = RecepAndIngrMapper.dtoToRecipeNoIngr(rDto);
-        Set<Ingredient> newIngs = rDto.getIngredients().stream().map(iDto ->
+        Set<Ingredient> newIngredients = rDto.getIngredients().stream().map(iDto ->
                 RecepAndIngrMapper.dtoToIngredientWithType(iDto,
                         IngredientType.builder().name(NameStringHelper.toTitleCase(iDto.getName())).build())
         ).collect(Collectors.toSet());
-        recipe.setIngredients(newIngs);
+        recipe.setIngredients(newIngredients);
         return recipe;
     }
 
     @Test
     void findRecipesWithSpecificDetails() {
-        List<RecipeDto> recipeDtos = readManyDtoFromFile("batch1-10-recipes.json");
-        List<Recipe> readRecipesFromFile = recipeDtos.stream().map(this::convertDtoToRecipe).toList();
+        List<RecipeDto> recipeDtoList = readManyDtoFromFile();
+        List<Recipe> readRecipesFromFile = recipeDtoList.stream().map(this::convertDtoToRecipe).toList();
 
         assertThat(readRecipesFromFile).hasSize(10);
 
-        // TODO this !
+        when(recipeRepo.findAll()).thenReturn(readRecipesFromFile);
+
+        Boolean veggie = true;
+        Integer minServ = 0;
+        Integer maxServ = 8;
+        List<String> incl = Lists.newArrayList();
+        List<String> excl = Lists.newArrayList();
+        List<RecipeDto> foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
+
+        assertThat(foundItems).hasSize(5);
+        assertThat(foundItems).extracting("name")
+                .containsOnly("Pancakes", "Stuffed Peppers", "Quinoa Salad", "Lentil Soup", "Mushroom Risotto");
+
+        minServ = null;
+        maxServ = 6;
+        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
+        assertThat(foundItems).hasSize(4);
+        assertThat(foundItems).extracting("name")
+                .containsOnly("Stuffed Peppers", "Quinoa Salad", "Lentil Soup", "Mushroom Risotto");
+
+        veggie = null;
+        maxServ = null;
+        incl = List.of("Onion"); //  onion in recipes[Mushroom Risotto, Beef Stroganoff, Lentil Soup, Chili Con Carne]
+        excl = List.of("Bell Peppers"); // bell peppers in recipes[Chili Con Carne, Stuffed Peppers]
+        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
+        assertThat(foundItems).hasSize(3);
+        assertThat(foundItems).extracting("name")
+                        .containsOnly("Mushroom Risotto", "Beef Stroganoff", "Lentil Soup");
+
+        incl = List.of("Onion", "Arborio Rice");
+        excl = Lists.newArrayList();
+        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
+        assertThat(foundItems).hasSize(1);
+        assertThat(foundItems).extracting("name").containsOnly("Mushroom Risotto");
+
+        excl = List.of("mushrooms");
+        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
+        assertThat(foundItems).isEmpty();
     }
 
     @Test

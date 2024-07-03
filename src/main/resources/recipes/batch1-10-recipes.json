@@ -304,12 +304,12 @@
   {
     "name": "Pancakes",
     "isVegetarian": true,
-    "servings": 4,
+    "servings": 8,
     "instructions": "In a bowl, mix flour, baking powder, salt, and sugar. In another bowl, whisk milk, egg, and melted butter. Combine wet and dry ingredients, then cook pancakes on a griddle over medium heat until bubbles form and edges are dry. Flip and cook until golden brown.",
     "ingredients": [
       {
         "name": "all-purpose flour",
-        "volume": "1 cup"
+        "volume": "2 cup"
       },
       {
         "name": "baking powder",
@@ -317,23 +317,23 @@
       },
       {
         "name": "salt",
-        "volume": "1/2 teaspoon"
+        "volume": "1 teaspoon"
       },
       {
         "name": "sugar",
-        "volume": "1 tablespoon"
+        "volume": "2 tablespoon"
       },
       {
         "name": "milk",
-        "volume": "1 cup"
+        "volume": "2 cup"
       },
       {
         "name": "egg",
-        "volume": "1"
+        "volume": "2"
       },
       {
         "name": "butter",
-        "volume": "2 tablespoons",
+        "volume": "4 tablespoons",
         "remark": "melted"
       }
     ]
