@@ -1,14 +1,17 @@
 package nl.trickjurgen.recipes.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import nl.trickjurgen.recipes.datamodel.Ingredient;
 import nl.trickjurgen.recipes.datamodel.IngredientType;
 import nl.trickjurgen.recipes.datamodel.Recipe;
 import nl.trickjurgen.recipes.dto.RecipeDto;
 import nl.trickjurgen.recipes.exception.RecipeNotFoundException;
+import nl.trickjurgen.recipes.mapper.RecepAndIngrMapper;
 import nl.trickjurgen.recipes.repo.IngredientRepo;
 import nl.trickjurgen.recipes.repo.IngredientTypeRepo;
 import nl.trickjurgen.recipes.repo.RecipeRepo;
+import nl.trickjurgen.recipes.utils.NameStringHelper;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -155,11 +159,62 @@ class RecipeServiceTest {
         assertThat(savedRecipe.getIngredients()).hasSize(6);
     }
 
-    @Test
-    void updateRecipe() throws IOException {
-        RecipeDto recipeDto1 = readDtoFromFile("r3-veg-stirfry.json");
+    final String storedRecipe = """
+            {"id": 101, "name": "Vegetable Stir Fry", "vegetarian": true, "servings": 4,
+                        "instructions": "Heat oil in a large pan. Add chopped vegetables and stir-fry for 5-7 minutes. Add soy sauce and cook for another 2 minutes.",
+                        "ingredients": [
+                    {"id": 551, "ingredientType": {"id":1010, "name": "Broccoli"}, "volume": "1 head", "remark": "cut into florets"},
+                    {"id": 552, "ingredientType": {"id":1011, "name": "Soy Sauce"}, "volume": "3 tablespoons"},
+                    {"id": 553, "ingredientType": {"id":1012, "name": "Olive Oil"}, "volume": "2 tablespoons"}
+              ]}
+            """;
 
-        // TODO this !
+    final String updateRecipeDto = """
+            {"id": 101, "name": "Vegetable Stir Fry", "isVegetarian": true, "servings": 3,
+                        "instructions": "Heat oil in a large pan. Add chopped vegetables and stir-fry for 5-7 minutes. Add soy sauce and cook for another 2 minutes. Serve with rice",
+                        "ingredients": [
+                    {"name": "Broccoli", "volume": "1 head", "remark": "cut into florets"},
+                    {"name": "Carrots", "volume": "1", "remark": "sliced"},
+                    {"name": "Bell Pepper", "volume": "1", "remark": "sliced"},
+                    {"name": "Dark Soy Sauce", "volume": "3 tablespoons"},
+                    {"name": "Olive Oil", "volume": "2 tablespoons"},
+                    {"name": "Rice", "volume": "300 grams", "remark": "steamed"}
+              ]}
+            """;
+
+    private Optional<IngredientType> getIngTypeFromTestData(Recipe dbRecipe, String name) {
+        return dbRecipe.getIngredients().stream()
+                .map(Ingredient::getIngredientType)
+                .filter(type -> type.getName().equalsIgnoreCase(name))
+                .findFirst();
+    }
+
+    @Test
+    void updateRecipe() throws JsonProcessingException {
+        // setup data
+        final Long dbId = 101L;
+        Recipe dbRecipe = objectMapper.readValue(storedRecipe, Recipe.class);
+        assertThat(dbRecipe).isNotNull();
+        RecipeDto recipeDto = objectMapper.readValue(updateRecipeDto, RecipeDto.class);
+        assertThat(recipeDto).isNotNull();
+        // feed the dummies (mocks)
+        when(recipeRepo.save(any())).then(returnsFirstArg());
+        when(recipeRepo.existsById(dbId)).thenReturn(true);
+        when(recipeRepo.getReferenceById(dbId)).thenReturn(dbRecipe);
+        when(ingredientRepo.save(any())).then(returnsFirstArg());
+        // mock will take care of call to ingredientRepo.delete()
+        when(ingredientTypeRepo.findByName(anyString()))
+                .thenAnswer(i -> {
+                    String name = i.getArgument(0, String.class);
+                    return getIngTypeFromTestData(dbRecipe, name);
+                });
+        when(ingredientTypeRepo.save(any())).then(returnsFirstArg());
+
+        RecipeDto updatedRecipe = recipeService.updateRecipe(recipeDto);
+
+        assertThat(updatedRecipe.getIngredients()).hasSize(6); // 2 old, 1 deleted, 4 new
+        assertThat(updatedRecipe.getServings()).isEqualTo(3);
+        assertThat(updatedRecipe.getInstructions()).contains("Serve with rice");
     }
 
     @Test
@@ -174,26 +229,48 @@ class RecipeServiceTest {
     }
 
     private List<RecipeDto> readManyDtoFromFile(final String fileName) {
-        List<RecipeDto> retVal = new ArrayList<>();
         try {
-            byte[] bytes = getBytesFromJsonFile(fileName);
-            RecipeDto[] recipeDtos = objectMapper.readValue(bytes, RecipeDto[].class);
+            RecipeDto[] recipeDtos = objectMapper.readValue(getBytesFromJsonFile(fileName), RecipeDto[].class);
             assertThat(recipeDtos).isNotNull();
-            retVal.addAll(List.of(recipeDtos));
+            return List.of(recipeDtos);
         } catch (Exception e) {
             fail("file {} load issue: {}", fileName, e.getMessage());
             throw new AssertionError(e);
         }
-        return retVal;
+    }
+
+    private Recipe convertDtoToRecipe(RecipeDto rDto) {
+        Recipe recipe = RecepAndIngrMapper.dtoToRecipeNoIngr(rDto);
+        Set<Ingredient> newIngs = rDto.getIngredients().stream().map(iDto ->
+                RecepAndIngrMapper.dtoToIngredientWithType(iDto,
+                        IngredientType.builder().name(NameStringHelper.toTitleCase(iDto.getName())).build())
+        ).collect(Collectors.toSet());
+        recipe.setIngredients(newIngs);
+        return recipe;
     }
 
     @Test
     void findRecipesWithSpecificDetails() {
+        List<RecipeDto> recipeDtos = readManyDtoFromFile("batch1-10-recipes.json");
+        List<Recipe> readRecipesFromFile = recipeDtos.stream().map(this::convertDtoToRecipe).toList();
+
+        assertThat(readRecipesFromFile).hasSize(10);
+
         // TODO this !
     }
 
     @Test
     void flatListIngredients() {
-        // TODO this !
+        Recipe noIngredients = Recipe.builder().name("bad example").servings(1).isVegetarian(false).instructions("no intel found").build();
+        Recipe recipeBeef = convertDtoToRecipe(readDtoFromFile("r4-beef-tacos.json"));
+
+        assertThat(recipeService.flatListIngredients(noIngredients)).isEmpty();
+
+        List<String> flatted = recipeService.flatListIngredients(recipeBeef);
+        assertThat(flatted).isNotEmpty();
+        assertThat(flatted).contains("Lettuce");
+        assertThat(flatted).contains("Cheddar Cheese");
+        assertThat(flatted).contains("Water");
+        assertThat(flatted).contains("Taco Shells");
     }
 }
