@@ -262,8 +262,8 @@ class RecipeServiceTest {
         Boolean veggie = true;
         Integer minServ = 0;
         Integer maxServ = 8;
-        List<String> incl = Lists.newArrayList();
-        List<String> excl = Lists.newArrayList();
+        List<String> incl = null;
+        List<String> excl = null;
         List<RecipeDto> foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
 
         assertThat(foundItems).hasSize(5);
