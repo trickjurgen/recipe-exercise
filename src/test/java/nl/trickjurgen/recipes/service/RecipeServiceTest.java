@@ -270,6 +270,7 @@ class RecipeServiceTest {
         assertThat(foundItems).extracting("name")
                 .containsOnly("Pancakes", "Stuffed Peppers", "Quinoa Salad", "Lentil Soup", "Mushroom Risotto");
 
+        // veggie true, minServ 0, incl null, excl null
         minServ = null;
         maxServ = 6;
         foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
@@ -277,6 +278,7 @@ class RecipeServiceTest {
         assertThat(foundItems).extracting("name")
                 .containsOnly("Stuffed Peppers", "Quinoa Salad", "Lentil Soup", "Mushroom Risotto");
 
+        // minServ null
         veggie = null;
         maxServ = null;
         incl = List.of("Onion"); //  onion in recipes[Mushroom Risotto, Beef Stroganoff, Lentil Soup, Chili Con Carne, Quinoa Salad]
@@ -286,12 +288,14 @@ class RecipeServiceTest {
         assertThat(foundItems).extracting("name")
                         .containsOnly("Mushroom Risotto", "Beef Stroganoff", "Lentil Soup", "Quinoa Salad");
 
+        // veggie null, minServ null, maxServ null
         incl = List.of("Onion", "Arborio Rice");
         excl = Lists.newArrayList();
         foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
         assertThat(foundItems).hasSize(1);
         assertThat(foundItems).extracting("name").containsOnly("Mushroom Risotto");
 
+        // veggie null, minServ null, maxServ null, incl = [onion, arborio rice]
         excl = List.of("mushrooms");
         foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
         assertThat(foundItems).isEmpty();
