@@ -167,19 +167,11 @@ public class RecipeService {
         Optional.ofNullable(maxServing).ifPresent(maxVal -> filters.add(recipe -> recipe.getServings() <= maxVal));
 
         if (null != includes) {
-            filters.addAll(
-                    includes.stream()
-                            .map(NameStringHelper::toTitleCase)
-                            .map(titleCase -> (Predicate<Recipe>) recipe -> flatListIngredients(recipe).contains(titleCase))
-                            .toList()
-            );
+            includes.forEach(str -> filters.add(recipe -> flattenIngredients(recipe).contains(str.toLowerCase())));
         }
 
         if (null != excludes) {
-            for (String ingredientName : excludes) {
-                final String titleCase = NameStringHelper.toTitleCase(ingredientName);
-                filters.add(recipe -> !flatListIngredients(recipe).contains(titleCase));
-            }
+            excludes.forEach(str -> filters.add(recipe -> !flattenIngredients(recipe).contains(str.toLowerCase())));
         }
 
         final Predicate<Recipe> combinedFilter = filters.stream().reduce(Predicate::and).orElse(x -> true);
@@ -189,9 +181,11 @@ public class RecipeService {
                 .collect(Collectors.toList());
     }
 
-    /*default*/ List<String> flatListIngredients(final Recipe recipe) {
-        if (recipe.getIngredients() == null) return Collections.emptyList();
-        return recipe.getIngredients().stream().map(ingredient -> ingredient.getIngredientType().getName()).toList();
+    /*default (for test)*/ String flattenIngredients(final Recipe recipe) {
+        if (recipe.getIngredients() == null) return "";
+        return recipe.getIngredients().stream()
+                .map(ingredient -> ingredient.getIngredientType().getName().toLowerCase())
+                .collect(Collectors.joining(" "));
     }
 
 }

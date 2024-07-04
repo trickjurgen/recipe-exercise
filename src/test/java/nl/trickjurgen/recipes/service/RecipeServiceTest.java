@@ -279,12 +279,12 @@ class RecipeServiceTest {
 
         veggie = null;
         maxServ = null;
-        incl = List.of("Onion"); //  onion in recipes[Mushroom Risotto, Beef Stroganoff, Lentil Soup, Chili Con Carne]
+        incl = List.of("Onion"); //  onion in recipes[Mushroom Risotto, Beef Stroganoff, Lentil Soup, Chili Con Carne, Quinoa Salad]
         excl = List.of("Bell Peppers"); // bell peppers in recipes[Chili Con Carne, Stuffed Peppers]
         foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
-        assertThat(foundItems).hasSize(3);
+        assertThat(foundItems).hasSize(4);
         assertThat(foundItems).extracting("name")
-                        .containsOnly("Mushroom Risotto", "Beef Stroganoff", "Lentil Soup");
+                        .containsOnly("Mushroom Risotto", "Beef Stroganoff", "Lentil Soup", "Quinoa Salad");
 
         incl = List.of("Onion", "Arborio Rice");
         excl = Lists.newArrayList();
@@ -302,13 +302,15 @@ class RecipeServiceTest {
         Recipe noIngredients = Recipe.builder().name("bad example").servings(1).isVegetarian(false).instructions("no intel found").build();
         Recipe recipeBeef = convertDtoToRecipe(readDtoFromFile("r4-beef-tacos.json"));
 
-        assertThat(recipeService.flatListIngredients(noIngredients)).isEmpty();
+        assertThat(recipeService.flattenIngredients(noIngredients)).isEmpty();
 
-        List<String> flatted = recipeService.flatListIngredients(recipeBeef);
+        String flatted = recipeService.flattenIngredients(recipeBeef);
         assertThat(flatted).isNotEmpty();
-        assertThat(flatted).contains("Lettuce");
-        assertThat(flatted).contains("Cheddar Cheese");
-        assertThat(flatted).contains("Water");
-        assertThat(flatted).contains("Taco Shells");
+        assertThat(flatted).contains("lettuce");
+        assertThat(flatted).contains("cheddar cheese");
+        assertThat(flatted).contains("cheddar");
+        assertThat(flatted).contains("water");
+        assertThat(flatted).contains("taco shells");
+        assertThat(flatted).contains("shells");
     }
 }
