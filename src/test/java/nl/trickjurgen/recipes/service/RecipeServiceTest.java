@@ -7,7 +7,9 @@ import nl.trickjurgen.recipes.datamodel.IngredientType;
 import nl.trickjurgen.recipes.datamodel.Recipe;
 import nl.trickjurgen.recipes.dto.RecipeDto;
 import nl.trickjurgen.recipes.dto.RecipeHeaderDto;
+import nl.trickjurgen.recipes.exception.DuplicateRecipeException;
 import nl.trickjurgen.recipes.exception.RecipeNotFoundException;
+import nl.trickjurgen.recipes.exception.RecipeParameterException;
 import nl.trickjurgen.recipes.mapper.RecepAndIngrMapper;
 import nl.trickjurgen.recipes.repo.IngredientRepo;
 import nl.trickjurgen.recipes.repo.IngredientTypeRepo;
@@ -154,11 +156,27 @@ class RecipeServiceTest {
         assertThat(dto.getName()).contains("Bolognese");
         assertThat(dto.getIngredients()).hasSize(6);
 
-        RecipeDto savedRecipe = recipeService.saveNewRecipe((dto));
+        RecipeDto savedRecipe = recipeService.saveNewRecipe(dto);
 
         assertThat(savedRecipe.getName()).contains("Bolognese");
         assertThat(savedRecipe.getId()).isNotNull();
         assertThat(savedRecipe.getIngredients()).hasSize(6);
+    }
+
+    @Test
+    void saveNewNoId() {
+        RecipeDto dto = readDtoFromFile("r2-spagetti-bol.json");
+        dto.setId(500L);
+
+        assertThatThrownBy(() -> recipeService.saveNewRecipe(dto)).isInstanceOf(RecipeParameterException.class);
+    }
+
+    @Test
+    void saveNewAlreadyExist() {
+        RecipeDto dto = readDtoFromFile("r2-spagetti-bol.json");
+        when(recipeRepo.findByName(anyString())).thenReturn(Optional.of(Recipe.builder().build()));
+
+        assertThatThrownBy(() -> recipeService.saveNewRecipe(dto)).isInstanceOf(DuplicateRecipeException.class);
     }
 
     final String storedRecipe = """
