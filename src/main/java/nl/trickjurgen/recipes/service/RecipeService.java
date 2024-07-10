@@ -157,21 +157,21 @@ public class RecipeService {
         return true;
     }
 
+    private void addFilterIfObjNotNull(List<Predicate<Recipe>> filters, final Object obj, final Predicate<Recipe> predicate) {
+        if (obj != null) filters.add(predicate);
+    }
+
     public List<RecipeDto> findRecipesWithSpecificDetails(final Boolean isVeggie, final Integer minServing,
                                                           final Integer maxServing, final List<String> includes,
                                                           final List<String> excludes) {
         List<Recipe> allRecipes = recipeRepo.findAll();
 
         final List<Predicate<Recipe>> filters = new ArrayList<>();
-        Optional.ofNullable(isVeggie).ifPresent(vega -> filters.add(recipe -> recipe.isVegetarian() == vega));
-        Optional.ofNullable(minServing).ifPresent(minVal -> filters.add(recipe -> recipe.getServings() >= minVal));
-        Optional.ofNullable(maxServing).ifPresent(maxVal -> filters.add(recipe -> recipe.getServings() <= maxVal));
-        if (null != includes) {
-            includes.forEach(inclStr -> filters.add(recipe -> flattenIngredients(recipe).contains(inclStr.toLowerCase())));
-        }
-        if (null != excludes) {
-            excludes.forEach(exclStr -> filters.add(recipe -> !flattenIngredients(recipe).contains(exclStr.toLowerCase())));
-        }
+        addFilterIfObjNotNull(filters, isVeggie, recipe -> recipe.isVegetarian() == isVeggie);
+        addFilterIfObjNotNull(filters, minServing, recipe -> recipe.getServings() >= minServing);
+        addFilterIfObjNotNull(filters, maxServing, recipe -> recipe.getServings() <= maxServing);
+        Optional.ofNullable(includes).ifPresent(list -> list.forEach(str -> filters.add(recipe -> flattenIngredients(recipe).contains(str.toLowerCase()))));
+        Optional.ofNullable(excludes).ifPresent(list -> list.forEach(str -> filters.add(recipe -> !flattenIngredients(recipe).contains(str.toLowerCase()))));
 
         final Predicate<Recipe> combinedFilter = filters.stream().reduce(Predicate::and).orElse(x -> true);
         final List<Recipe> filteredRecipes = allRecipes.stream().filter(combinedFilter).toList();
