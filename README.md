@@ -31,25 +31,75 @@ All these requirements needs to be satisfied:
 
 # Strategy
 ## Recipe Structure
+
 recipe must have flag to indicate vegetarian
-recipe must have
+
+recipe must have :
 - name, 
 - id, 
 - list of ingredients (minimum 0?), 
 - preparation steps/instructions,
 - number of servings
-ingredient must have a 
+
+ingredient must have a :
 - name, 
 - quantity + unit of measure,
 - remark (optional)
 
-minimal table structure could be: 1) recipe table, linking to 2) ingredients table (FK=recipe.id)
-fancier would be: 1) recipe table, 2) ingredient_type table, 3) recipe_ingredient coupling table (FK1 = recipe.id, FK2= ingredient_type.id)
+minimal table structure could be: 
+
+1) recipe table, linking to 2) ingredients table (FK=recipe.id)
+
+fancier would be: 
+
+1) recipe table, 2) ingredient_type table, 3) recipe_ingredient coupling table (FK1 = recipe.id, FK2= ingredient_type.id)
 this might pose some issues with typo's, spelling differences, and/or letter-case usage/capitalization.
 
-API interfaces
-- recipes need to saved/fetched (CRUD); new = without ID, save/update/delete by ID
-- search results may contain parts of recipe info, navigate to full recipe by ID.
+## API
 
+API interfaces:
+- recipes need to be saved/fetched (CRUD); new = without ID, save/update/delete by ID
+- search results may contain either parts of recipe info or full recipes, from that data you can navigate to full recipe by ID.
 
+# Implementation
+
+## DB
+
+Initial setup with H2 (in memory) database. This is easy to initiate and has no issues with a changing datamodel during development.
+Later replace this with a MySql instance, Script a docker compose to run it without actual install.
+Keep the H2 for testing purposes.
+
+Went for the 'complexer' data model where ingredients (name) are separate entities that are reused across recipes.
+This might aid in searching later but it adds complexity in storing and updating entities in general.
+
+## Example / test data
+
+After creating entity objects (from strategy plan above) (and repository interfaces) create a few json files that match the entities.
+Use unit tests to map json files to entities and attempt to save to in memory database.
+Using this tested json set as example create a batch of data files to use in testing.
+
+## Code
+
+Used a bottom-up approach. 
+- first define the data classes
+- define test data
+- create db interfaces
+- validate db functionality with integration test
+- mappers between storage and communication entities
+- unit test mappers
+- create service layer
+- unit test service layer with mocks and testdata
+- update documentation
+
+currently about here
+
+- create API (controller/rest/endpoint) layer
+- test controller(s)
+- create actuators
+- integration test?
+- OpenAPI documentation
+- update documentation
+- UI or postman scripts or .. ?
+- use external service for data?
+- wiremock test for external svc?
 
