@@ -22,7 +22,7 @@ import lombok.Setter;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @Schema(description = "Short DTO for Recipe")
-public class RecipeHeader {
+public class RecipeHeaderDto {
     @Schema(example = "404", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty("id")
     private Long id;

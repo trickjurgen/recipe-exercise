@@ -5,6 +5,7 @@ import nl.trickjurgen.recipes.datamodel.IngredientType;
 import nl.trickjurgen.recipes.datamodel.Recipe;
 import nl.trickjurgen.recipes.dto.IngredientDto;
 import nl.trickjurgen.recipes.dto.RecipeDto;
+import nl.trickjurgen.recipes.dto.RecipeHeaderDto;
 import nl.trickjurgen.recipes.exception.DuplicateRecipeException;
 import nl.trickjurgen.recipes.exception.RecipeNotFoundException;
 import nl.trickjurgen.recipes.exception.RecipeParameterException;
@@ -19,7 +20,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -157,21 +157,20 @@ public class RecipeService {
         return true;
     }
 
-    public List<RecipeDto> findRecipesWithSpecificDetails(final Boolean isVeggie, final Integer minServing, final Integer maxServing,
-                                                          final List<String> includes, final List<String> excludes) {
+    public List<RecipeDto> findRecipesWithSpecificDetails(final Boolean isVeggie, final Integer minServing,
+                                                          final Integer maxServing, final List<String> includes,
+                                                          final List<String> excludes) {
         List<Recipe> allRecipes = recipeRepo.findAll();
 
-        List<Predicate<Recipe>> filters = new ArrayList<>();
-        Optional.ofNullable(isVeggie).ifPresent(bool -> filters.add(recipe -> recipe.isVegetarian() == bool));
+        final List<Predicate<Recipe>> filters = new ArrayList<>();
+        Optional.ofNullable(isVeggie).ifPresent(vega -> filters.add(recipe -> recipe.isVegetarian() == vega));
         Optional.ofNullable(minServing).ifPresent(minVal -> filters.add(recipe -> recipe.getServings() >= minVal));
         Optional.ofNullable(maxServing).ifPresent(maxVal -> filters.add(recipe -> recipe.getServings() <= maxVal));
-
         if (null != includes) {
-            includes.forEach(str -> filters.add(recipe -> flattenIngredients(recipe).contains(str.toLowerCase())));
+            includes.forEach(inclStr -> filters.add(recipe -> flattenIngredients(recipe).contains(inclStr.toLowerCase())));
         }
-
         if (null != excludes) {
-            excludes.forEach(str -> filters.add(recipe -> !flattenIngredients(recipe).contains(str.toLowerCase())));
+            excludes.forEach(exclStr -> filters.add(recipe -> !flattenIngredients(recipe).contains(exclStr.toLowerCase())));
         }
 
         final Predicate<Recipe> combinedFilter = filters.stream().reduce(Predicate::and).orElse(x -> true);
@@ -182,10 +181,20 @@ public class RecipeService {
     }
 
     /*default (for test)*/ String flattenIngredients(final Recipe recipe) {
-        if (recipe.getIngredients() == null) return "";
+        if (recipe.getIngredients() == null || recipe.getIngredients().isEmpty()) return "";
+        final String delimiter = " ";
         return recipe.getIngredients().stream()
                 .map(ingredient -> ingredient.getIngredientType().getName().toLowerCase())
-                .collect(Collectors.joining(" "));
+                .collect(Collectors.joining(delimiter));
+    }
+
+    public List<RecipeHeaderDto> findRecipeHeadersWithGivenParams(final Boolean isVeggie, final Integer minServing,
+                                                                  final Integer maxServing, final List<String> includes,
+                                                                  final List<String> excludes) {
+        final List<RecipeDto> fullRecipes = findRecipesWithSpecificDetails(isVeggie, minServing, maxServing, includes, excludes);
+        return fullRecipes.stream()
+                .filter(recipeDto -> recipeDto.getId() != null)
+                .map(RecepAndIngrMapper::RecipeDtoToHeader).toList();
     }
 
 }

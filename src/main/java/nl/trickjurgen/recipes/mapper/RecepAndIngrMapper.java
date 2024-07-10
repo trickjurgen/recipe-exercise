@@ -5,6 +5,7 @@ import nl.trickjurgen.recipes.datamodel.IngredientType;
 import nl.trickjurgen.recipes.datamodel.Recipe;
 import nl.trickjurgen.recipes.dto.IngredientDto;
 import nl.trickjurgen.recipes.dto.RecipeDto;
+import nl.trickjurgen.recipes.dto.RecipeHeaderDto;
 import nl.trickjurgen.recipes.utils.NameStringHelper;
 
 import java.util.Collections;
@@ -52,6 +53,15 @@ public class RecepAndIngrMapper {
                 .name(ingredient.getIngredientType().getName())
                 .volume(ingredient.getVolume())
                 .remark(ingredient.getRemark())
+                .build();
+    }
+
+    public static RecipeHeaderDto RecipeDtoToHeader(final RecipeDto recipeDto) {
+        return RecipeHeaderDto.builder()
+                .id(recipeDto.getId())
+                .name(recipeDto.getName())
+                .isVegetarian(recipeDto.isVegetarian())
+                .servings(recipeDto.getServings())
                 .build();
     }
 

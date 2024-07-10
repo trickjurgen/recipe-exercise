@@ -46,6 +46,7 @@ public class Ingredient {
     @NotNull
     private String remark; // extra info like "optional" or "subst with raisins"
 
+    @Builder.Default
     @ManyToMany(mappedBy = "ingredients", fetch = FetchType.LAZY)
     private Set<Recipe> usedInRecipes = new HashSet<>();
 

@@ -50,6 +50,7 @@ public class Recipe {
     @NotNull
     private String instructions;
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
     @JoinTable(name = "recipe_ingredients",
             joinColumns = {@JoinColumn(name = "recipe_id")},

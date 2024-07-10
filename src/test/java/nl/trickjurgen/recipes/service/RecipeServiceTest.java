@@ -6,6 +6,7 @@ import nl.trickjurgen.recipes.datamodel.Ingredient;
 import nl.trickjurgen.recipes.datamodel.IngredientType;
 import nl.trickjurgen.recipes.datamodel.Recipe;
 import nl.trickjurgen.recipes.dto.RecipeDto;
+import nl.trickjurgen.recipes.dto.RecipeHeaderDto;
 import nl.trickjurgen.recipes.exception.RecipeNotFoundException;
 import nl.trickjurgen.recipes.mapper.RecepAndIngrMapper;
 import nl.trickjurgen.recipes.repo.IngredientRepo;
@@ -286,7 +287,7 @@ class RecipeServiceTest {
         foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
         assertThat(foundItems).hasSize(4);
         assertThat(foundItems).extracting("name")
-                        .containsOnly("Mushroom Risotto", "Beef Stroganoff", "Lentil Soup", "Quinoa Salad");
+                .containsOnly("Mushroom Risotto", "Beef Stroganoff", "Lentil Soup", "Quinoa Salad");
 
         // veggie null, minServ null, maxServ null
         incl = List.of("Onion", "Arborio Rice");
@@ -299,6 +300,26 @@ class RecipeServiceTest {
         excl = List.of("mushrooms");
         foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
         assertThat(foundItems).isEmpty();
+    }
+
+    @Test
+    void findRecipeHeadersWithSpecificDetails() {
+        List<Recipe> readRecipesFromFile = readManyDtoFromFile().stream().map(this::convertDtoToRecipe).toList();
+        assertThat(readRecipesFromFile).hasSize(10);
+        long baseId = 404L; // fake/mock that this comes from DB and therefore has ID
+        for (Recipe recipe : readRecipesFromFile) {
+            recipe.setId(baseId++);
+        }
+        when(recipeRepo.findAll()).thenReturn(readRecipesFromFile);
+
+        Boolean veggie = true;
+        Integer minServ = 0;
+        Integer maxServ = 8;
+        List<String> incl = null;
+        List<String> excl = null;
+        List<RecipeHeaderDto> headers = recipeService.findRecipeHeadersWithGivenParams(veggie, minServ, maxServ, incl, excl);
+
+        assertThat(headers).hasSize(5);
     }
 
     @Test
@@ -317,4 +338,5 @@ class RecipeServiceTest {
         assertThat(flatted).contains("taco shells");
         assertThat(flatted).contains("shells");
     }
+
 }

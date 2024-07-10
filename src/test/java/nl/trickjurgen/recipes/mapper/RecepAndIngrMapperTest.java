@@ -5,8 +5,10 @@ import nl.trickjurgen.recipes.datamodel.IngredientType;
 import nl.trickjurgen.recipes.datamodel.Recipe;
 import nl.trickjurgen.recipes.dto.IngredientDto;
 import nl.trickjurgen.recipes.dto.RecipeDto;
+import nl.trickjurgen.recipes.dto.RecipeHeaderDto;
 import org.junit.jupiter.api.Test;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -49,6 +51,20 @@ class RecepAndIngrMapperTest {
         assertThat(recipe.getName()).contains("Egg");
         assertThat(recipe.getIngredients()).hasSize(2);
         assertThat(recipe.getIngredients()).extracting(i -> i.getIngredientType().getName()).contains("Egg", "Butter");
+    }
+
+    @Test
+    void recipeDtoToHeader() {
+        RecipeDto recipeDto = RecipeDto.builder().id(404L).name("Fried Egg").isVegetarian(false).servings(1)
+                .instructions("Add to pan and heat").ingredients(Collections.emptySet()).build();
+
+        RecipeHeaderDto recipeHeaderDto = RecepAndIngrMapper.RecipeDtoToHeader(recipeDto);
+
+        assertThat(recipeHeaderDto).isNotNull();
+        assertThat(recipeHeaderDto.getId()).isEqualTo(recipeDto.getId());
+        assertThat(recipeHeaderDto.getName()).isEqualTo(recipeDto.getName());
+        assertThat(recipeHeaderDto.isVegetarian()).isFalse();
+        assertThat(recipeHeaderDto.getServings()).isEqualTo(1);
     }
 
 }
