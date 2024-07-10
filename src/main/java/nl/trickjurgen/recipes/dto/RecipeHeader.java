@@ -14,8 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Set;
-
 @Setter
 @Getter
 @Builder
@@ -23,10 +21,9 @@ import java.util.Set;
 @AllArgsConstructor
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
-@Schema(description ="DTO for Recipe")
-public class RecipeDto {
-
-    @Schema(example = "404", requiredMode = Schema.RequiredMode.NOT_REQUIRED)
+@Schema(description = "Short DTO for Recipe")
+public class RecipeHeader {
+    @Schema(example = "404", requiredMode = Schema.RequiredMode.REQUIRED)
     @JsonProperty("id")
     private Long id;
 
@@ -48,17 +45,5 @@ public class RecipeDto {
     @Positive
     @NotNull
     private int servings;
-
-    @Schema(example = "Fry meat, put in earthenware, cover with mash.", requiredMode = Schema.RequiredMode.REQUIRED)
-    @JsonProperty("instructions")
-    @NotEmpty
-    @NotBlank
-    @NotNull
-    private String instructions;
-
-    @Schema(example = "[{\"name\": \"ground meat\", \"volume\": \"300gr.\"}, {\"name\": \"Mash\", \"volume\": \"300gr.\", \"remark\": \"enough to cover\"}]"
-            , requiredMode = Schema.RequiredMode.REQUIRED)
-    @JsonProperty("ingredients")
-    private Set<IngredientDto> ingredients;
 
 }

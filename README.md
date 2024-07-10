@@ -100,6 +100,11 @@ currently about here
 - OpenAPI documentation
 - update documentation
 - UI or postman scripts or .. ?
+
+nice to haves / experiments?
+
 - use external service for data?
 - wiremock test for external svc?
+- SOAP controller (same as json api, but give xml)
+- testcontainers
 
