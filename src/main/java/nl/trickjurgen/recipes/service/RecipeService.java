@@ -100,15 +100,16 @@ public class RecipeService {
 
     private Set<Ingredient> mergeIngredients(Set<Ingredient> savedIngredients, Set<IngredientDto> newIngredients) {
         final HashSet<Ingredient> mergedIngredients = new HashSet<>();
-        final List<String> newIngrNames = newIngredients.stream().map(IngredientDto::getName).map(NameStringHelper::toTitleCase).toList();
+        final List<String> newIngredientNames = newIngredients.stream().map(IngredientDto::getName).map(NameStringHelper::toTitleCase).toList();
         // update or remove existing
-        for (Ingredient ing : savedIngredients) {
-            if (newIngrNames.contains(ing.getIngredientType().getName())) {
-                Ingredient changed = updateIngredientWithDtoFields(ing, newIngredients);
+        for (Ingredient ingredient : savedIngredients) {
+            final boolean oldIngredientIsInNewOnes = newIngredientNames.contains(ingredient.getIngredientType().getName());
+            if (oldIngredientIsInNewOnes) {
+                Ingredient changed = updateIngredientWithDtoFields(ingredient, newIngredients);
                 ingredientRepo.save(changed);
                 mergedIngredients.add(changed);
             } else {
-                ingredientRepo.delete(ing);
+                ingredientRepo.delete(ingredient);
             }
         }
         // add all the new ones
