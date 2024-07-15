@@ -7,7 +7,6 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -17,9 +16,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Setter
 @Getter
@@ -45,9 +41,5 @@ public class Ingredient {
     @Column(name = "remark", nullable = true)
     @NotNull
     private String remark; // extra info like "optional" or "subst with raisins"
-
-    @Builder.Default
-    @ManyToMany(mappedBy = "ingredients", fetch = FetchType.LAZY)
-    private Set<Recipe> usedInRecipes = new HashSet<>();
 
 }
