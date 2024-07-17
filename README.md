@@ -122,4 +122,7 @@ Used a bottom-up approach.
 - instructions for generating api doc
 	- with maven command in target
 	- from running app
+- unit test to validate 
+- use record data type?
+- use advanced switch?
 

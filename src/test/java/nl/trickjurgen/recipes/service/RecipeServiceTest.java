@@ -230,7 +230,7 @@ class RecipeServiceTest {
                 });
         when(ingredientTypeRepo.save(any())).then(returnsFirstArg());
 
-        RecipeDto updatedRecipe = recipeService.updateRecipe(recipeDto);
+        RecipeDto updatedRecipe = recipeService.updateRecipe(dbId, recipeDto);
 
         assertThat(updatedRecipe.getIngredients()).hasSize(6); // 2 old, 1 deleted, 4 new
         assertThat(updatedRecipe.getServings()).isEqualTo(3);
@@ -280,44 +280,85 @@ class RecipeServiceTest {
 
         Boolean veggie = true;
         Integer minServ = 0;
-        Integer maxServ = 8;
+        int maxServ = 8;
         List<String> incl = null;
         List<String> excl = null;
-        List<RecipeDto> foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
+        String partOfInstructions = null;
+        List<RecipeDto> foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl, partOfInstructions);
 
         assertThat(foundItems).hasSize(5);
         assertThat(foundItems).extracting("name")
                 .containsOnly("Pancakes", "Stuffed Peppers", "Quinoa Salad", "Lentil Soup", "Mushroom Risotto");
 
-        // veggie true, minServ 0, incl null, excl null
+        // veggie true, minServ 0, incl null, excl null, partOfInstructions null
         minServ = null;
         maxServ = 6;
-        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
+        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl, partOfInstructions);
         assertThat(foundItems).hasSize(4);
         assertThat(foundItems).extracting("name")
                 .containsOnly("Stuffed Peppers", "Quinoa Salad", "Lentil Soup", "Mushroom Risotto");
 
-        // minServ null
-        veggie = null;
-        maxServ = null;
-        incl = List.of("Onion"); //  onion in recipes[Mushroom Risotto, Beef Stroganoff, Lentil Soup, Chili Con Carne, Quinoa Salad]
-        excl = List.of("Bell Peppers"); // bell peppers in recipes[Chili Con Carne, Stuffed Peppers]
-        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
+    }
+
+    @Test
+    void findRecipesWithSpecificDetails_incl_excl() {
+        List<Recipe> readRecipesFromFile = readManyDtoFromFile().stream().map(this::convertDtoToRecipe).toList();
+        assertThat(readRecipesFromFile).hasSize(10);
+        when(recipeRepo.findAll()).thenReturn(readRecipesFromFile);
+
+        Boolean veggie = null;
+        Integer minServ = null;
+        Integer maxServ = null;
+        String partOfInstructions = null;
+        List<RecipeDto> foundItems;
+
+        List<String> incl = List.of("Onion"); //  onion in recipes[Mushroom Risotto, Beef Stroganoff, Lentil Soup, Chili Con Carne, Quinoa Salad]
+        List<String> excl = List.of("Bell Peppers"); // bell peppers in recipes[Chili Con Carne, Stuffed Peppers]
+        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl, partOfInstructions);
         assertThat(foundItems).hasSize(4);
         assertThat(foundItems).extracting("name")
                 .containsOnly("Mushroom Risotto", "Beef Stroganoff", "Lentil Soup", "Quinoa Salad");
 
-        // veggie null, minServ null, maxServ null
+        // veggie null, minServ null, maxServ null, partOfInstructions null
         incl = List.of("Onion", "Arborio Rice");
         excl = Lists.newArrayList();
-        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
+        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl, partOfInstructions);
         assertThat(foundItems).hasSize(1);
         assertThat(foundItems).extracting("name").containsOnly("Mushroom Risotto");
 
-        // veggie null, minServ null, maxServ null, incl = [onion, arborio rice]
+        // veggie null, minServ null, maxServ null, incl = [onion, arborio rice], partOfInstructions null
         excl = List.of("mushrooms");
-        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl);
+        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl, partOfInstructions);
         assertThat(foundItems).isEmpty();
+    }
+
+    @Test
+    void findRecipesWithSpecificDetails_textInstructions() {
+        List<Recipe> readRecipesFromFile = readManyDtoFromFile().stream().map(this::convertDtoToRecipe).toList();
+        assertThat(readRecipesFromFile).hasSize(10);
+        when(recipeRepo.findAll()).thenReturn(readRecipesFromFile);
+
+        Boolean veggie = null;
+        Integer minServ = null;
+        Integer maxServ = null;
+        List<String> incl = null;
+        List<String> excl = null;
+
+        String partOfInstructions = "Simmer";
+
+        List<RecipeDto> foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl, partOfInstructions);
+
+        assertThat(foundItems).hasSize(3);
+        assertThat(foundItems).extracting("name").containsOnly("Beef Stroganoff", "Lentil Soup","Chili Con Carne");
+
+        partOfInstructions = "Serve"; // 6 results
+        incl = List.of("lemon juice"); // 2 result
+        excl = List.of("tomatoes"); // -3 results
+
+        foundItems = recipeService.findRecipesWithSpecificDetails(veggie, minServ, maxServ, incl, excl, partOfInstructions);
+
+        assertThat(foundItems).hasSize(1);
+        assertThat(foundItems).extracting("name").containsOnly("Shrimp Scampi");
     }
 
     @Test
@@ -335,7 +376,8 @@ class RecipeServiceTest {
         Integer maxServ = 8;
         List<String> incl = null;
         List<String> excl = null;
-        List<RecipeHeaderDto> headers = recipeService.findRecipeHeadersWithGivenParams(veggie, minServ, maxServ, incl, excl);
+        String partOfInstr = null;
+        List<RecipeHeaderDto> headers = recipeService.findRecipeHeadersWithGivenParams(veggie, minServ, maxServ, incl, excl, partOfInstr);
 
         assertThat(headers).hasSize(5);
     }

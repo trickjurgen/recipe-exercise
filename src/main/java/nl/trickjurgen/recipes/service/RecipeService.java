@@ -43,6 +43,7 @@ public class RecipeService {
         this.ingredientRepo = ingredientRepo;
     }
 
+    // TODO add javadoc to public methods
     public List<RecipeDto> findAllRecipes() {
         return recipeRepo.findAll()
                 .stream()
@@ -51,10 +52,14 @@ public class RecipeService {
     }
 
     public RecipeDto findRecipeById(final Long id) {
+        verifyIdValidAndExists(id);
+        return RecepAndIngrMapper.recipeToDto(recipeRepo.getReferenceById(id));
+    }
+
+    private void verifyIdValidAndExists(Long id) {
         if (id == null || id < 1L || !recipeRepo.existsById(id)) {
             throw new RecipeNotFoundException("bad recipe id");
         }
-        return RecepAndIngrMapper.recipeToDto(recipeRepo.getReferenceById(id));
     }
 
     public RecipeDto saveNewRecipe(final RecipeDto recipeDto) {
@@ -80,9 +85,10 @@ public class RecipeService {
         return ingredientRepo.save(RecepAndIngrMapper.dtoToIngredientWithType(ing, ingType));
     }
 
-    public RecipeDto updateRecipe(final RecipeDto recipeDto) {
-        if (recipeDto.getId() == null || recipeDto.getId() < 1L || !recipeRepo.existsById(recipeDto.getId())) {
-            throw new RecipeNotFoundException("bad recipe id");
+    public RecipeDto updateRecipe(final Long recipeId, final RecipeDto recipeDto) {
+        verifyIdValidAndExists(recipeId);
+        if (!recipeId.equals(recipeDto.getId())) {
+            throw new RecipeParameterException("Bad ID or does not match data");
         }
         Recipe newVersionRecipe = RecepAndIngrMapper.dtoToRecipeNoIngr(recipeDto);
         // get stored
@@ -143,9 +149,7 @@ public class RecipeService {
     }
 
     public boolean deleteRecipe(final Long recipeId) {
-        if (recipeId == null || recipeId < 1L || !recipeRepo.existsById(recipeId)) {
-            throw new RecipeNotFoundException("bad recipe id");
-        }
+        verifyIdValidAndExists(recipeId);
         try {
             Recipe storedRecipe = recipeRepo.getReferenceById(recipeId);
             storedRecipe.getIngredients().forEach(ingredientRepo::delete);
@@ -164,7 +168,7 @@ public class RecipeService {
 
     public List<RecipeDto> findRecipesWithSpecificDetails(final Boolean isVeggie, final Integer minServing,
                                                           final Integer maxServing, final List<String> includes,
-                                                          final List<String> excludes) {
+                                                          final List<String> excludes, final String partOfInstructions) {
         List<Recipe> allRecipes = recipeRepo.findAll();
 
         final List<Predicate<Recipe>> filters = new ArrayList<>();
@@ -173,6 +177,8 @@ public class RecipeService {
         addFilterIfObjNotNull(filters, maxServing, recipe -> recipe.getServings() <= maxServing);
         Optional.ofNullable(includes).ifPresent(list -> list.forEach(str -> filters.add(recipe -> flattenIngredients(recipe).contains(str.toLowerCase()))));
         Optional.ofNullable(excludes).ifPresent(list -> list.forEach(str -> filters.add(recipe -> !flattenIngredients(recipe).contains(str.toLowerCase()))));
+        addFilterIfObjNotNull(filters, partOfInstructions,
+                recipe -> recipe.getInstructions().toLowerCase().contains(partOfInstructions.toLowerCase()));
 
         final Predicate<Recipe> combinedFilter = filters.stream().reduce(Predicate::and).orElse(x -> true);
         final List<Recipe> filteredRecipes = allRecipes.stream().filter(combinedFilter).toList();
@@ -191,8 +197,8 @@ public class RecipeService {
 
     public List<RecipeHeaderDto> findRecipeHeadersWithGivenParams(final Boolean isVeggie, final Integer minServing,
                                                                   final Integer maxServing, final List<String> includes,
-                                                                  final List<String> excludes) {
-        final List<RecipeDto> fullRecipes = findRecipesWithSpecificDetails(isVeggie, minServing, maxServing, includes, excludes);
+                                                                  final List<String> excludes, final String instruction) {
+        final List<RecipeDto> fullRecipes = findRecipesWithSpecificDetails(isVeggie, minServing, maxServing, includes, excludes, instruction);
         return fullRecipes.stream()
                 .filter(recipeDto -> recipeDto.getId() != null)
                 .map(RecepAndIngrMapper::RecipeDtoToHeader).toList();
