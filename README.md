@@ -85,7 +85,7 @@ Used a bottom-up approach.
 	- first define the data classes
 	- define test data
 	- create db interfaces
-	- validate db functionality with integration test
+	- validate db functionality with (layer) integration test
 - service layer
 	- mappers between storage and communication entities
 	- unit test mappers
@@ -98,17 +98,20 @@ Used a bottom-up approach.
 - Interface layer
 	- create API (controller/rest/endpoint) layer
 	- test controller(s)
-	- create actuators
-	- integration test?
 	- OpenAPI documentation
 	- update documentation
+- Monitoring
+	- create actuators
+	- test actuators
+- stability
+	- multi-layer integration test?
 - external access
 	- UI or postman scripts or .. ?
 
 ## Nice to haves / experiments?
 
 - use an external service for data?
-- wiremock test for external svc?
+	- wiremock test for external svc?
 - add a SOAP controller (same as json api, but gives xml)
 - use testcontainers in integrationtest
 
