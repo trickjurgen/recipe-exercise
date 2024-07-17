@@ -81,30 +81,42 @@ Using this tested json set as example create a batch of data files to use in tes
 ## Code
 
 Used a bottom-up approach. 
-- first define the data classes
-- define test data
-- create db interfaces
-- validate db functionality with integration test
-- mappers between storage and communication entities
-- unit test mappers
-- create service layer
-- unit test service layer with mocks and testdata
-- update documentation
+- data layer
+	- first define the data classes
+	- define test data
+	- create db interfaces
+	- validate db functionality with integration test
+- service layer
+	- mappers between storage and communication entities
+	- unit test mappers
+	- create service layer
+	- unit test service layer with mocks and testdata
+	- update documentation
 
-currently about here
+*currently implementation is about here*
 
-- create API (controller/rest/endpoint) layer
-- test controller(s)
-- create actuators
-- integration test?
-- OpenAPI documentation
-- update documentation
-- UI or postman scripts or .. ?
+- Interface layer
+	- create API (controller/rest/endpoint) layer
+	- test controller(s)
+	- create actuators
+	- integration test?
+	- OpenAPI documentation
+	- update documentation
+- external access
+	- UI or postman scripts or .. ?
 
-nice to haves / experiments?
+## Nice to haves / experiments?
 
-- use external service for data?
+- use an external service for data?
 - wiremock test for external svc?
-- SOAP controller (same as json api, but give xml)
-- testcontainers
+- add a SOAP controller (same as json api, but gives xml)
+- use testcontainers in integrationtest
+
+## TODO's
+
+- instructions for running db (docker compose)
+- instructions for running app (command line; or also in a docker?)
+- instructions for generating api doc
+	- with maven command in target
+	- from running app
 
