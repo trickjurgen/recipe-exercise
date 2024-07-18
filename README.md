@@ -92,11 +92,16 @@ Used a bottom-up approach.
 	- create service layer
 	- unit test service layer with mocks and testdata
 	- update documentation
+- Interface layer
+	- create API (controller/rest/endpoint) layer
+
+---
 
 *currently implementation is about here*
 
-- Interface layer
-	- create API (controller/rest/endpoint) layer
+---
+
+- Interface layer (bis)
 	- test controller(s)
 	- OpenAPI documentation
 	- update documentation

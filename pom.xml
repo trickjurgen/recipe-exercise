@@ -23,6 +23,7 @@
 		<swagger.version>2.2.20</swagger.version>
 		<jakarta-validation.version>3.0.2</jakarta-validation.version>
 		<mysql.version>8.2.0</mysql.version>
+		<restassured.version>5.5.0</restassured.version>
 	</properties>
 
 	<dependencies>
@@ -95,6 +96,12 @@
 			<groupId>org.assertj</groupId>
 			<artifactId>assertj-core</artifactId>
 			<version>${assertj.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>io.rest-assured</groupId>
+			<artifactId>rest-assured</artifactId>
+			<version>${restassured.version}</version>
 			<scope>test</scope>
 		</dependency>
 
