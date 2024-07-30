@@ -7,6 +7,7 @@ import io.restassured.response.Response;
 import nl.trickjurgen.recipes.datamodel.Ingredient;
 import nl.trickjurgen.recipes.dto.IngredientDto;
 import nl.trickjurgen.recipes.dto.RecipeDto;
+import nl.trickjurgen.recipes.dto.RecipeHeaderDto;
 import nl.trickjurgen.recipes.exception.RecipeNotFoundException;
 import nl.trickjurgen.recipes.repo.IngredientRepo;
 import nl.trickjurgen.recipes.service.RecipeService;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -253,8 +255,23 @@ class RecipeControllerTest {
     }
 
     @Test
-    void getAllRecipeNames() {
+    void getAllRecipeNames() throws IOException {
+        RecipeDto recipeDto = loadRecipeFromFile("r3-veg-stirfry.json");
+        RestAssured.given().contentType(ContentType.JSON).body(recipeDto)
+                .when().post(ENDPOINT_BASE_PATH).then().statusCode(201);
+        recipeDto = loadRecipeFromFile("r4-beef-tacos.json");
+        RestAssured.given().contentType(ContentType.JSON).body(recipeDto)
+                .when().post(ENDPOINT_BASE_PATH).then().statusCode(201);
 
+        List<RecipeHeaderDto> headerDtos = Arrays.asList(RestAssured.given()
+                .when()
+                .get(ENDPOINT_BASE_PATH)
+                .then()
+                .statusCode(200)
+                .extract().response().as(RecipeHeaderDto[].class));
+
+        assertThat(headerDtos).hasSizeGreaterThan(1);
+        assertThat(headerDtos).extracting("name").contains("Vegetable Stir Fry","Beef Tacos");
     }
 
 }
