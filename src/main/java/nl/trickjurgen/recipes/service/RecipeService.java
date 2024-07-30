@@ -43,7 +43,6 @@ public class RecipeService {
         this.ingredientRepo = ingredientRepo;
     }
 
-    // TODO add javadoc to public methods
     public List<RecipeDto> findAllRecipes() {
         return recipeRepo.findAll()
                 .stream()
@@ -56,7 +55,7 @@ public class RecipeService {
         return RecepAndIngrMapper.recipeToDto(recipeRepo.getReferenceById(id));
     }
 
-    private void verifyIdValidAndExists(Long id) {
+    private void verifyIdValidAndExists(final Long id) {
         if (id == null || id < 1L || !recipeRepo.existsById(id)) {
             throw new RecipeNotFoundException("bad recipe id");
         }
@@ -87,6 +86,7 @@ public class RecipeService {
 
     public RecipeDto updateRecipe(final Long recipeId, final RecipeDto recipeDto) {
         verifyIdValidAndExists(recipeId);
+        logger.info("id verified");
         if (!recipeId.equals(recipeDto.getId())) {
             throw new RecipeParameterException("Bad ID or does not match data");
         }
@@ -98,25 +98,31 @@ public class RecipeService {
         storedRecipe.setVegetarian(newVersionRecipe.isVegetarian());
         storedRecipe.setServings(newVersionRecipe.getServings());
         storedRecipe.setInstructions(newVersionRecipe.getInstructions());
-        storedRecipe.setIngredients(mergeIngredients(storedRecipe.getIngredients(), recipeDto.getIngredients()));
+        final List<Ingredient> ingredientsToBeDeleted = findRedundantIngredients(storedRecipe.getIngredients(), recipeDto.getIngredients());
+        storedRecipe.setIngredients(createMergedIngredients(storedRecipe.getIngredients(), recipeDto.getIngredients()));
         // overwrite mutations in repo and be happy
         Recipe saved = recipeRepo.save(storedRecipe);
+        ingredientsToBeDeleted.forEach(ingredientRepo::delete);
         return RecepAndIngrMapper.recipeToDto(saved);
     }
 
-    private Set<Ingredient> mergeIngredients(Set<Ingredient> savedIngredients, Set<IngredientDto> newIngredients) {
+    private List<Ingredient> findRedundantIngredients(Set<Ingredient> savedIngredients, Set<IngredientDto> newIngredients) {
+        final List<String> newIngredientNames = newIngredients.stream().map(IngredientDto::getName).map(NameStringHelper::toTitleCase).toList();
+        Predicate<Ingredient> oldIngredientIsNotInNewOnes = ingredient -> !newIngredientNames.contains(ingredient.getIngredientType().getName());
+        return savedIngredients.stream().filter(oldIngredientIsNotInNewOnes).toList();
+    }
+
+    private Set<Ingredient> createMergedIngredients(Set<Ingredient> savedIngredients, Set<IngredientDto> newIngredients) {
         final HashSet<Ingredient> mergedIngredients = new HashSet<>();
         final List<String> newIngredientNames = newIngredients.stream().map(IngredientDto::getName).map(NameStringHelper::toTitleCase).toList();
-        // update or remove existing
+        // update existing, ignore delete-able ones
         for (Ingredient ingredient : savedIngredients) {
             final boolean oldIngredientIsInNewOnes = newIngredientNames.contains(ingredient.getIngredientType().getName());
             if (oldIngredientIsInNewOnes) {
                 Ingredient changed = updateIngredientWithDtoFields(ingredient, newIngredients);
                 ingredientRepo.save(changed);
                 mergedIngredients.add(changed);
-            } else {
-                ingredientRepo.delete(ingredient);
-            }
+            } // else ignore, it will be deleted after saving merge
         }
         // add all the new ones
         final List<String> curIngrList = mergedIngredients.stream().map(i -> i.getIngredientType().getName()).toList();
@@ -202,6 +208,11 @@ public class RecipeService {
         return fullRecipes.stream()
                 .filter(recipeDto -> recipeDto.getId() != null)
                 .map(RecepAndIngrMapper::RecipeDtoToHeader).toList();
+    }
+
+    public RecipeDto findRecipeByName(final String name) {
+        Optional<Recipe> byName = recipeRepo.findByName(name);
+        return byName.map(RecepAndIngrMapper::recipeToDto).orElse(null);
     }
 
 }
