@@ -158,8 +158,6 @@ public class RecipeService {
         verifyIdValidAndExists(recipeId);
         try {
             Recipe storedRecipe = recipeRepo.getReferenceById(recipeId);
-            storedRecipe.getIngredients().forEach(ingredientRepo::delete);
-            // FIXME this could leave ingredientTypes unused, maybe cleanup of those here?
             recipeRepo.delete(storedRecipe);
         } catch (IllegalArgumentException e) {
             logger.error("failed to delete (part of) recipe with ID {}", recipeId);

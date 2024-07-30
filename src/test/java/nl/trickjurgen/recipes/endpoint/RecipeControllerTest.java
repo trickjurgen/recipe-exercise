@@ -4,11 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
+import nl.trickjurgen.recipes.datamodel.Ingredient;
 import nl.trickjurgen.recipes.dto.IngredientDto;
 import nl.trickjurgen.recipes.dto.RecipeDto;
+import nl.trickjurgen.recipes.exception.RecipeNotFoundException;
+import nl.trickjurgen.recipes.repo.IngredientRepo;
 import nl.trickjurgen.recipes.service.RecipeService;
 import org.assertj.core.util.Lists;
-import org.assertj.core.util.Sets;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
@@ -28,8 +30,8 @@ import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT)
@@ -38,9 +40,7 @@ class RecipeControllerTest {
 
     private final Logger logger = LoggerFactory.getLogger(RecipeControllerTest.class);
 
-    // TODO setup some test data; as test run on H2 database, that is initially empty, load some data to be not empty
     // FIXME this test could also use test-containers instead of H2
-
 
     @LocalServerPort
     private int port;
@@ -48,12 +48,15 @@ class RecipeControllerTest {
     private final ResourceLoader resourceLoader;
     private final ObjectMapper objectMapper;
     private final RecipeService recipeService;
+    private final IngredientRepo ingredientRepo;
 
     final static String ENDPOINT_BASE_PATH = "/recipes";
 
     @Autowired
-    public RecipeControllerTest(ResourceLoader resourceLoader, ObjectMapper objectMapper, RecipeService recipeService) {
+    public RecipeControllerTest(ResourceLoader resourceLoader, ObjectMapper objectMapper, RecipeService recipeService,
+                                IngredientRepo ingredientRepo) {
         this.recipeService = recipeService;
+        this.ingredientRepo = ingredientRepo;
         this.objectMapper = objectMapper;
         this.resourceLoader = resourceLoader;
     }
@@ -83,10 +86,14 @@ class RecipeControllerTest {
                 .then().assertThat().statusCode(404);
     }
 
-    private void loadRecipeFromFileAndPutInDb(final String filename) throws IOException {
-        File file = resourceLoader.getResource("classpath:recipes/" + filename).getFile();
+    private RecipeDto loadRecipeFromFile(final String fileName) throws IOException {
+        File file = resourceLoader.getResource("classpath:recipes/" + fileName).getFile();
         byte[] bytes = Files.readAllBytes(file.toPath());
-        RecipeDto recipeDto = objectMapper.readValue(bytes, RecipeDto.class);
+        return objectMapper.readValue(bytes, RecipeDto.class);
+    }
+
+    private void loadRecipeFromFileAndPutInDb(final String filename) throws IOException {
+        RecipeDto recipeDto = loadRecipeFromFile(filename);
         RecipeDto saved = recipeService.saveNewRecipe(recipeDto);
         savedDbIds.add(saved.getId());
         logger.info("Stored recipe from {} as id {}", filename, saved.getId());
@@ -153,11 +160,26 @@ class RecipeControllerTest {
                 .build();
     }
 
+    private static RecipeDto createModifiedHotToddyRecipe(long savedId, final String name) {
+        return RecipeDto.builder()
+                .id(savedId) // now ID is important!
+                .name(name)
+                .isVegetarian(true)
+                .instructions("Boil water, add to cup, add lime juice + bourbon + sugar. Drink very hot.")
+                .ingredients(Set.of(
+                        IngredientDto.builder().name("Water").volume("2 DL.").build(),
+                        IngredientDto.builder().name("bourbon").volume("4 cl").remark("any brand will do").build(),
+                        IngredientDto.builder().name("lime juice").volume("3 tsp.").build(),
+                        IngredientDto.builder().name("sugar").volume("1 scoop").build()
+                ))
+                .build();
+    }
+
     @Test
     @Order(5)
     @Transactional
     void updateRecipe() {
-        // recipe can be created in previous test, if this test is run in isolation then create it
+        // recipe could already be created in previous test, if this test is run in isolation then create it
         RecipeDto hotToddy = recipeService.findRecipeByName("Hot Toddy");
         if (null == hotToddy) {
             hotToddy = RestAssured.given()
@@ -170,50 +192,69 @@ class RecipeControllerTest {
         assertThat(savedId).isPositive();
 
         // create "changed" contents
-        RecipeDto newVersion = RecipeDto.builder()
-                .id(savedId) // now ID is important!
-                .name(hotToddy.getName())
-                .isVegetarian(true)
-                .instructions("Boil water, add to cup, add lime juice + bourbon + sugar. Drink very hot.")
-                .ingredients(Set.of(
-                        IngredientDto.builder().name("Water").volume("2 DL.").build(),
-                        IngredientDto.builder().name("bourbon").volume("4 cl").remark("any brand will do").build(),
-                        IngredientDto.builder().name("lime juice").volume("3 tsp.").build(),
-                        IngredientDto.builder().name("sugar").volume("1 scoop").build()
-                ))
-                .build();
+        RecipeDto modifiedRecipe = createModifiedHotToddyRecipe(savedId, hotToddy.getName());
 
         RecipeDto resultingRecipe = RestAssured.given()
                 .contentType(ContentType.JSON)
-                .body(newVersion)
+                .body(modifiedRecipe)
                 .when()
                 .put(ENDPOINT_BASE_PATH + "/" + savedId)
                 .then()
                 .statusCode(200)
                 .extract().response().as(RecipeDto.class);
 
-
-        // TODO verify changed data
-
+        assertThat(resultingRecipe.getId()).isEqualTo(savedId);
+        assertThat(resultingRecipe.getIngredients()).extracting("name")
+                .contains("Bourbon","Lime Juice")
+                .doesNotContain("Whiskey","Lemon Juice");
     }
 
     @Test
+    @Order(6)
+    void testDeleteByWrongId() {
+        long badId = 404_404L;
+        assertThat(savedDbIds).doesNotContain(badId);
+
+        RestAssured.given().when().delete(ENDPOINT_BASE_PATH + "/" + badId)
+                .then().statusCode(404);
+    }
+
+
+    @Test
+    @Order(7)
     @Transactional
     void deleteRecipe() throws IOException {
-        loadRecipeFromFileAndPutInDb("r2-spagetti-bol.json");
-        long storedRecipeId = savedDbIds.getLast();
+        RecipeDto recipeDto = loadRecipeFromFile("r2-spagetti-bol.json");
+        RecipeDto storedRecipe = RestAssured.given()
+                .contentType(ContentType.JSON).body(recipeDto)
+                .when().post(ENDPOINT_BASE_PATH)
+                .then().statusCode(201).extract().response().as(RecipeDto.class);
+        long storedRecipeId = storedRecipe.getId();
 
         assertThat(storedRecipeId).isPositive();
         assertThat(recipeService.findRecipeById(storedRecipeId)).isNotNull();
 
-        // tODO call delete
+        RestAssured.given()
+                .when()
+                .delete(ENDPOINT_BASE_PATH + "/" + storedRecipeId)
+                .then()
+                .statusCode(204);
 
-        // tODO assert it can't be found anymore (2 ways?)
+        assertThatThrownBy(() -> recipeService.findRecipeById(storedRecipeId)).isInstanceOf(RecipeNotFoundException.class);
+        assertThat(storedRecipe.getIngredients().iterator().hasNext()).isTrue();
+        IngredientDto next = storedRecipe.getIngredients().iterator().next();
+        assertThat(ingredientRepo.existsById(next.getId())).as("should not contain %s anymore",next.getName()).isFalse();
 
+        RestAssured.given()
+                .when()
+                .delete(ENDPOINT_BASE_PATH + "/" + storedRecipeId)
+                .then()
+                .statusCode(404);
     }
 
     @Test
     void getAllRecipeNames() {
+
     }
 
 }
