@@ -43,7 +43,7 @@ public class RecipeSearchController {
     @ApiResponse(responseCode = "404", description = "Not Found")
     @ApiResponse(responseCode = "500", description = "Failure")
     public ResponseEntity<List<RecipeHeaderDto>> getMatchingRecipesForAspects(
-            @Parameter(description = "vegetarian: yes,no,all")
+            @Parameter(description = "vegetarian: true/false")
             @RequestParam(name = "isVegetarian", required = false) Boolean isVegetarian,
             @Parameter(description = "min. # servings; if limited")
             @RequestParam(name = "minServings", required = false) Integer minServings,
@@ -53,7 +53,7 @@ public class RecipeSearchController {
             @RequestParam(name = "includedIngredients", required = false) String inclusions,
             @Parameter(description = "comma-separated list of ingredients to be excluded")
             @RequestParam(name = "excludedIngredients", required = false) String exclusions,
-            @Parameter(description = "text to be in instructions")
+            @Parameter(description = "text that has to be in instructions")
             @RequestParam(name = "instruction", required = false) String instruction
     ) {
         List<String> includes = NameStringHelper.mapCsvToList(inclusions);

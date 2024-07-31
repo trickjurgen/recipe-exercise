@@ -44,6 +44,7 @@ class RecipeControllerTest {
 
     // FIXME this test could also use test-containers instead of H2
 
+    @SuppressWarnings("unused") // tell intellij not to complain about injected value
     @LocalServerPort
     private int port;
 
@@ -91,21 +92,16 @@ class RecipeControllerTest {
     private RecipeDto loadRecipeFromFile(final String fileName) throws IOException {
         File file = resourceLoader.getResource("classpath:recipes/" + fileName).getFile();
         byte[] bytes = Files.readAllBytes(file.toPath());
+        logger.info("loaded test data from {}", fileName);
         return objectMapper.readValue(bytes, RecipeDto.class);
-    }
-
-    private void loadRecipeFromFileAndPutInDb(final String filename) throws IOException {
-        RecipeDto recipeDto = loadRecipeFromFile(filename);
-        RecipeDto saved = recipeService.saveNewRecipe(recipeDto);
-        savedDbIds.add(saved.getId());
-        logger.info("Stored recipe from {} as id {}", filename, saved.getId());
     }
 
     @Test
     @Order(3)
     void getRecipeById_ok() throws IOException {
-        loadRecipeFromFileAndPutInDb("r1-chicken-curry.json");
-        assertThat(savedDbIds).isNotEmpty();
+        RecipeDto loadedRecipeFromFile = loadRecipeFromFile("r1-chicken-curry.json");
+        RecipeDto saved = recipeService.saveNewRecipe(loadedRecipeFromFile);
+        savedDbIds.add(saved.getId());
 
         Response response = RestAssured.given().when().get(ENDPOINT_BASE_PATH + "/" + savedDbIds.getLast())
                 .then().assertThat()
@@ -185,9 +181,9 @@ class RecipeControllerTest {
         RecipeDto hotToddy = recipeService.findRecipeByName("Hot Toddy");
         if (null == hotToddy) {
             hotToddy = RestAssured.given()
-                            .contentType(ContentType.JSON).body(createHotToddyRecipe())
-                            .when().post(ENDPOINT_BASE_PATH)
-                            .then().statusCode(201).extract().response().as(RecipeDto.class);
+                    .contentType(ContentType.JSON).body(createHotToddyRecipe())
+                    .when().post(ENDPOINT_BASE_PATH)
+                    .then().statusCode(201).extract().response().as(RecipeDto.class);
         }
         assertThat(recipeService.findRecipeByName("Hot Toddy")).isNotNull();
         final long savedId = hotToddy.getId();
@@ -207,8 +203,8 @@ class RecipeControllerTest {
 
         assertThat(resultingRecipe.getId()).isEqualTo(savedId);
         assertThat(resultingRecipe.getIngredients()).extracting("name")
-                .contains("Bourbon","Lime Juice")
-                .doesNotContain("Whiskey","Lemon Juice");
+                .contains("Bourbon", "Lime Juice")
+                .doesNotContain("Whiskey", "Lemon Juice");
     }
 
     @Test
@@ -245,7 +241,7 @@ class RecipeControllerTest {
         assertThatThrownBy(() -> recipeService.findRecipeById(storedRecipeId)).isInstanceOf(RecipeNotFoundException.class);
         assertThat(storedRecipe.getIngredients().iterator().hasNext()).isTrue();
         IngredientDto next = storedRecipe.getIngredients().iterator().next();
-        assertThat(ingredientRepo.existsById(next.getId())).as("should not contain %s anymore",next.getName()).isFalse();
+        assertThat(ingredientRepo.existsById(next.getId())).as("should not contain %s anymore", next.getName()).isFalse();
 
         RestAssured.given()
                 .when()
@@ -271,7 +267,7 @@ class RecipeControllerTest {
                 .extract().response().as(RecipeHeaderDto[].class));
 
         assertThat(headerDtos).hasSizeGreaterThan(1);
-        assertThat(headerDtos).extracting("name").contains("Vegetable Stir Fry","Beef Tacos");
+        assertThat(headerDtos).extracting("name").contains("Vegetable Stir Fry", "Beef Tacos");
     }
 
 }
