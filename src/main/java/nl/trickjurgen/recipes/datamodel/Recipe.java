@@ -9,6 +9,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
+import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
@@ -46,6 +47,7 @@ public class Recipe {
     @Column(name = "servings", nullable = false)
     private int servings;
 
+    @Lob // make this string a text field in database instead of default 255 char
     @Column(name = "instructions", nullable = false)
     @NotNull
     private String instructions;

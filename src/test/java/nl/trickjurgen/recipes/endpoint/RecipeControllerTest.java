@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.response.Response;
-import nl.trickjurgen.recipes.datamodel.Ingredient;
 import nl.trickjurgen.recipes.dto.IngredientDto;
 import nl.trickjurgen.recipes.dto.RecipeDto;
 import nl.trickjurgen.recipes.dto.RecipeHeaderDto;
