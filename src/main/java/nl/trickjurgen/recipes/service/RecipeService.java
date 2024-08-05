@@ -174,6 +174,7 @@ public class RecipeService {
                                                           final Integer maxServing, final List<String> includes,
                                                           final List<String> excludes, final String partOfInstructions) {
         List<Recipe> allRecipes = recipeRepo.findAll();
+        logger.info("total in db = {}", allRecipes.size());
 
         final List<Predicate<Recipe>> filters = new ArrayList<>();
         addFilterIfObjNotNull(filters, isVeggie, recipe -> recipe.isVegetarian() == isVeggie);
@@ -203,6 +204,8 @@ public class RecipeService {
                                                                   final Integer maxServing, final List<String> includes,
                                                                   final List<String> excludes, final String instruction) {
         final List<RecipeDto> fullRecipes = findRecipesWithSpecificDetails(isVeggie, minServing, maxServing, includes, excludes, instruction);
+        logger.info("found {} items",fullRecipes.size());
+        logger.info("veg={}, min={}, max={}, incl={}, excl={}, instr={}",isVeggie,minServing,maxServing,includes,excludes,instruction);
         return fullRecipes.stream()
                 .filter(recipeDto -> recipeDto.getId() != null)
                 .map(RecepAndIngrMapper::RecipeDtoToHeader).toList();

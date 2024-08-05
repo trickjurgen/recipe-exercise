@@ -270,6 +270,20 @@ class RecipeServiceTest {
     }
 
     @Test
+    void findRecipesWith_No_SpecificDetails() {
+        List<RecipeDto> recipeDtoList = readManyDtoFromFile();
+        List<Recipe> readRecipesFromFile = recipeDtoList.stream().map(this::convertDtoToRecipe).toList();
+
+        assertThat(readRecipesFromFile).hasSize(10);
+
+        when(recipeRepo.findAll()).thenReturn(readRecipesFromFile);
+
+        List<RecipeDto> foundItems = recipeService.findRecipesWithSpecificDetails(null, null, null, null, null, null);
+
+        assertThat(foundItems).hasSize(10);
+    }
+
+    @Test
     void findRecipesWithSpecificDetails() {
         List<RecipeDto> recipeDtoList = readManyDtoFromFile();
         List<Recipe> readRecipesFromFile = recipeDtoList.stream().map(this::convertDtoToRecipe).toList();

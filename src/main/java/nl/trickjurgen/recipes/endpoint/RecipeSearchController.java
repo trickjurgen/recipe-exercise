@@ -29,7 +29,7 @@ public class RecipeSearchController {
     }
 
     // find recipes by specific properties
-    @GetMapping("") // /recipesearch?isVegetarian=true&minServings=1&maxServings=10&inclusions=carrot&exclusions=sausage,ice&instruction=stew
+    @GetMapping() // /recipesearch?isVegetarian=true&minServings=1&maxServings=10&inclusions=carrot&exclusions=sausage,ice&instruction=stew
     @Operation(summary = "Returns list of info for relevant recipes in system", description = """
             Get list of matching recipe headers, based on criteria: \n
             isVegetarian: true, false, or null/absent for both \n
@@ -56,10 +56,11 @@ public class RecipeSearchController {
             @Parameter(description = "text that has to be in instructions")
             @RequestParam(name = "instruction", required = false) String instruction
     ) {
-        List<String> includes = NameStringHelper.mapCsvToList(inclusions);
-        List<String> excludes = NameStringHelper.mapCsvToList(exclusions);
-        List<RecipeHeaderDto> headers = recipeService.findRecipeHeadersWithGivenParams(isVegetarian, minServings, maxServings, includes, excludes, instruction);
-        return ResponseEntity.ok(headers);
+        final List<String> includes = NameStringHelper.mapCsvToList(inclusions);
+        final List<String> excludes = NameStringHelper.mapCsvToList(exclusions);
+        final List<RecipeHeaderDto> recipeHeaders = recipeService.findRecipeHeadersWithGivenParams(isVegetarian, minServings, maxServings, includes, excludes, instruction);
+        System.out.println("ready to return " + recipeHeaders.size()+" headers");
+        return ResponseEntity.ok(recipeHeaders);
     }
 
 }
