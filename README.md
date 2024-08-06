@@ -94,6 +94,7 @@ Used a bottom-up approach.
 	- update documentation
 - Interface layer
 	- create API (controller/rest/endpoint) layer
+	- test controllers (2)
 
 ---
 
@@ -102,7 +103,6 @@ Used a bottom-up approach.
 ---
 
 - Interface layer (bis)
-	- test controller(s)
 	- OpenAPI documentation
 	- update documentation
 - Monitoring

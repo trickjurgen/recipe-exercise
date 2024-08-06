@@ -66,6 +66,7 @@ class RecipeControllerTest {
     @BeforeEach
     public void setUpEach() {
         RestAssured.port = port;
+        RestAssured.baseURI = "http://localhost";
     }
 
     private final List<Long> savedDbIds = Lists.newArrayList();

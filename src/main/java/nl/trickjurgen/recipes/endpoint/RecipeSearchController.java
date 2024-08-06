@@ -59,7 +59,6 @@ public class RecipeSearchController {
         final List<String> includes = NameStringHelper.mapCsvToList(inclusions);
         final List<String> excludes = NameStringHelper.mapCsvToList(exclusions);
         final List<RecipeHeaderDto> recipeHeaders = recipeService.findRecipeHeadersWithGivenParams(isVegetarian, minServings, maxServings, includes, excludes, instruction);
-        System.out.println("ready to return " + recipeHeaders.size()+" headers");
         return ResponseEntity.ok(recipeHeaders);
     }
 
