@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  mysql-db:
+    container_name: mysql-db-recipes
+    image: mysql:latest
+    environment:
+      MYSQL_DATABASE: recipes
+      MYSQL_ROOT_PASSWORD: my-little-secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./docker:/usr/src/docker-init
+      - db_data:/var/opt/mysql
+    #command: /usr/src/docker-init/setup.sql
+    restart: on-failure
+
+volumes:
+  db_data:
