@@ -112,6 +112,51 @@ Used a bottom-up approach.
 	- multi-layer integration test?
 - external access
 	- UI or postman scripts or .. ?
+	
+## Running the application locally
+
+Make sure you have docker (for example "docker desktop") installed.
+Run the following command from command-line in the app folder:
+```
+docker-compose -f docker-compose-db.yml up -d
+```
+This will (download and ) start the mysql database container.
+After starting it will show up in docker desktop application.
+Or you can check commandline with 
+```
+docker ps
+```
+for the status of the container.
+
+Install Java 21 or later (openjdk or oracle or ...)
+Either install maven 3.7 or higher or use the maven wrapper (mvnw) included in the project.
+Make sure that the installed Java (and optional maven) are in the system path.
+
+Build the application from the folder where the 'pom.xml' is with this command (usen 'mvn' or 'mvnw'):
+```
+mvn clean install
+```
+this should create a target folder with a jar and generated materials.
+
+Run the application with this command:
+```
+mvn spring-boot:run -Dspring-boot.run.profiles=default
+or
+./mvnw spring-boot:run -Dspring-boot.run.profiles=default
+```
+You can see that the app is running by visiting the actuator endpoint:
+http://localhost:8080/actuator
+
+## api documentation
+
+Run the app locally as described above.
+The documentation is hosted within the application on it's web interface:
+http://localhost:8080/swagger-ui/index.html
+
+the technical interface is at:
+http://localhost:8080/v3/api-docs (json)
+download yaml via http://localhost:8080/v3/api-docs.yaml
+
 
 ## Nice to haves / experiments?
 
