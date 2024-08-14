@@ -32,11 +32,12 @@ public class RecipeSearchController {
     @GetMapping() // /recipesearch?isVegetarian=true&minServings=1&maxServings=10&inclusions=carrot&exclusions=sausage,ice&instruction=stew
     @Operation(summary = "Returns list of info for relevant recipes in system", description = """
             Get list of matching recipe headers, based on criteria: \n
-            isVegetarian: true, false, or null/absent for both \n
-            minServings/maxServings: min number, max number \n
-            inclusions: (list) ingredients that need to be in it \n
-            exclusions: (list) ingredients that are not allowed to be in it \n
-            instruction: word that has to be in the instructions \n
+            isVegetarian: true, false \n
+            minServings: minimum number \n
+            maxServings: maximum number \n
+            inclusions: (csv 'list' of) ingredients that need to be in it \n
+            exclusions: (csv 'list' of) ingredients that are not allowed to be in it \n
+            instruction: text that has to be in the instructions \n
             all parts are optional.
             """)
     @ApiResponse(responseCode = "200", description = "Success")

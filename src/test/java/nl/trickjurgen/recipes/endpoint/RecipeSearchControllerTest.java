@@ -40,6 +40,7 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 @TestPropertySource(locations = "classpath:application-test.properties")
 class RecipeSearchControllerTest {
 
+    public static final String URL_PARAM_SEPARATOR = "?";
     private final Logger logger = LoggerFactory.getLogger(RecipeSearchControllerTest.class);
 
     // FIXME this test could also use test-containers instead of H2
@@ -93,9 +94,9 @@ class RecipeSearchControllerTest {
         }
     }
 
-    private String assembleSearchParams(Boolean vegetarian, Integer minServings, Integer maxServings, String includesCsv,
-                                        String excludesCsv, String partOfInstructions) {
-        // isVegetarian=true&minServings=1&maxServings=10&inclusions=carrot&exclusions=sausage,ice&instruction=stew
+    private String assembleSearchParams(final Boolean vegetarian, final Integer minServings, final Integer maxServings,
+                                        final String includesCsv, final String excludesCsv, final String partOfInstructions) {
+        // ?isVegetarian=true&minServings=1&maxServings=10&inclusions=carrot&exclusions=sausage,ice&instruction=stew
         String paramString = "";
         paramString = addSearchParam(paramString, "isVegetarian", vegetarian);
         paramString = addSearchParam(paramString, "minServings", minServings);
@@ -104,15 +105,13 @@ class RecipeSearchControllerTest {
         paramString = addSearchParam(paramString, "exclusions", excludesCsv);
         paramString = addSearchParam(paramString, "instruction", partOfInstructions);
         if (paramString.isBlank()) return ""; // avoid dangling question mark
-        return "?" + paramString;
+        return URL_PARAM_SEPARATOR + paramString;
     }
 
     private String addSearchParam(String paramstring, String prefix, Object value) {
-        if (null != value) {
-            String coupler = paramstring.isBlank() ? "" : "&";
-            return paramstring + coupler + prefix + "=" + value;
-        }
-        return paramstring;
+        if (null == value) return paramstring;
+        final String coupler = paramstring.isBlank() ? "" : "&";
+        return paramstring + coupler + prefix + "=" + value;
     }
 
     @Test
