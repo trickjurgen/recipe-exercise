@@ -95,6 +95,8 @@ Used a bottom-up approach.
 - Interface layer
 	- create API (controller/rest/endpoint) layer
 	- test controllers (2)
+	- OpenAPI documentation
+	- update documentation
 
 ---
 
@@ -102,11 +104,8 @@ Used a bottom-up approach.
 
 ---
 
-- Interface layer (bis)
-	- OpenAPI documentation
-	- update documentation
 - Monitoring
-	- create actuators
+	- create specific actuators
 	- test actuators
 - stability
 	- multi-layer integration test?
@@ -132,7 +131,7 @@ Install Java 21 or later (openjdk or oracle or ...)
 Either install maven 3.7 or higher or use the maven wrapper (mvnw) included in the project.
 Make sure that the installed Java (and optional maven) are in the system path.
 
-Build the application from the folder where the 'pom.xml' is with this command (usen 'mvn' or 'mvnw'):
+Build the application from the folder where the 'pom.xml' is with this command (use 'mvn' or the wrapper tool 'mvnw'):
 ```
 mvn clean install
 ```
@@ -157,7 +156,6 @@ the technical interface is at:
 http://localhost:8080/v3/api-docs (json)
 download yaml via http://localhost:8080/v3/api-docs.yaml
 
-
 ## Nice to haves / experiments?
 
 - use an external service for data?
@@ -167,12 +165,6 @@ download yaml via http://localhost:8080/v3/api-docs.yaml
 
 ## TODO's
 
-- instructions for running db (docker compose)
-- instructions for running app (command line; or also in a docker?)
-- instructions for generating api doc
-	- with maven command in target
-	- from running app
-- unit test to validate 
 - use record data type?
 - use advanced switch?
 
