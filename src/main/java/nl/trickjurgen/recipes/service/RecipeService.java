@@ -174,7 +174,6 @@ public class RecipeService {
                                                           final Integer maxServing, final List<String> includes,
                                                           final List<String> excludes, final String partOfInstructions) {
         List<Recipe> allRecipes = recipeRepo.findAll();
-        logger.info("total in db = {}", allRecipes.size());
 
         final List<Predicate<Recipe>> filters = new ArrayList<>();
         addFilterIfObjNotNull(filters, isVeggie, recipe -> recipe.isVegetarian() == isVeggie);
